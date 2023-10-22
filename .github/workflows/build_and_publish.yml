@@ -24,7 +24,6 @@ jobs:
           - name: Windows-amd64
             os: windows
             arch: amd64
-            arch: arm
           - name: Linux-arm64
             os: linux
             arch: arm64
