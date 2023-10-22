@@ -17,7 +17,7 @@ The basis for the NxG header is a 24-byte random string. The random string is us
 - Total par2 articles: `49`
 - Resulting string: `aR6Vpjnfhd01U288Q:415:49`
 
-The resulting string is then bas64 encoded to give the NxG Header:
+The resulting string is then base64 encoded to give the NxG Header:
 
 NxG Header: `YVI2VnBqbmZoZDAxVTI4OFE6NDE1OjQ5`
 
