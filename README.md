@@ -12,10 +12,10 @@ With the NxG Header, neither Usenet search engines nor NZB files are needed for 
 ## Calculation of the NxG Header
 The basis for the NxG header is a 24-byte random string. The random string is used as the filename for the rar archives (if enabled) and/or the par2 files (if enabled). Before uploading, the total number of articles for the data files and the total number of articles for the par2 files are calculated and overlaid with the random string:
 
-Random 24-byte string: `aR6Vpjnfhd01U288QM1zxElf`
-Total data articles: `415`
-Total par2 articles: `49`
-Resulting string: `aR6Vpjnfhd01U288Q:415:49`
+- Random 24-byte string: `aR6Vpjnfhd01U288QM1zxElf`
+- Total data articles: `415`
+- Total par2 articles: `49`
+- Resulting string: `aR6Vpjnfhd01U288Q:415:49`
 
 The resulting string is then bas64 encoded to give the NxG Header:
 
