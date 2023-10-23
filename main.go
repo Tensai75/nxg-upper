@@ -136,7 +136,7 @@ func main() {
 	}
 
 	title = filepath.Base(conf.Path)
-	shortHeader = randomString(24, 0, true)
+	shortHeader = randomString(21, 0, true)
 
 	// check for test mode
 	if conf.Test != "" {

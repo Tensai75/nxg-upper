@@ -10,16 +10,16 @@ Uploads made with NxG Upper are 100% compatible with the standard binary upload 
 With the NxG Header, neither Usenet search engines nor NZB files are needed for binary downloads. The message IDs for the articles are calculated directly from the NxG Header.
 
 ## Calculation of the NxG Header
-The basis for the NxG header is a 24-byte random string. The random string is used as the filename for the rar archives (if enabled) and/or the par2 files (if enabled). Before uploading, the total number of articles for the data files and the total number of articles for the par2 files are calculated and overlaid with the random string:
+The basis for the NxG header is a 21-byte random string. The random string is used as the filename for the rar archives (if enabled) and/or the par2 files (if enabled). Before uploading, the total number of articles for the data files and the total number of articles for the par2 files are calculated and overlaid with the random string:
 
-- Random 24-byte string: `aR6Vpjnfhd01U288QM1zxElf`
+- Random 21-byte string: `Vpjnfhd01U288QM1zxElf`
 - Total data articles: `415`
 - Total par2 articles: `49`
-- Resulting string: `aR6Vpjnfhd01U288Q:415:49`
+- Resulting string: `Vpjnfhd01U288Q:415:49`
 
-The resulting string is then base64 encoded to give the NxG Header:
+The resulting string is then base64 encoded to give the resulting 28-byte NxG Header:
 
-NxG Header: `YVI2VnBqbmZoZDAxVTI4OFE6NDE1OjQ5`
+NxG Header: `VnBqbmZoZDAxVTI4OFE6NDE1OjQ5`
 
 ## Calculation of the message IDs
 For each article, a 64-byte SHA256 hash of the following string is calculated:
@@ -69,6 +69,9 @@ This is a Proof of Concept with the minimum necessary features.
 So there is certainly a lot left to do.
 
 ## Version history
+### beta 2
+- reduce NxG Header to 28 bytes for better compatibility with the search engines
+
 ### beta 1
 - first public version
 
