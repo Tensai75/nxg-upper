@@ -42,7 +42,7 @@ type Args struct {
 	MakePar2           bool   `arg:"-"`
 	MakePar2_arg       string `arg:"--par2" help:"Make par2 files" placeholder:"true|false"`
 	Redundancy         int    `arg:"--redundancy" help:"Redundancy in %" placeholder:"0-100"`
-	Par2Exe            string `arg:"--parexe" help:"Path to the par2cmdline executable" placeholder:"PATH"`
+	Par2Exe            string `arg:"--parexe" help:"Path to the par executable (either par2 [par2cmdline] or parpar)" placeholder:"PATH"`
 	CsvPath            string `arg:"--csvpath" help:"CSV file path to log title, header, password, groups and date (leave empty too disable)" placeholder:"PATH"`
 	CsvDelimiter       string `arg:"--csvdelimiter" help:"CSV file delimiter" placeholder:"STRING"`
 	DelTempFolder      bool   `arg:"-"`

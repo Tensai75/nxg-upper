@@ -37,11 +37,15 @@ The SHA256 hash is then split into 3 parts to create the email-like message ID:
 This way, the message IDs can be easily calculated from the base64-decoded NxG Header.
 
 ## Requirements
-NxG Upper requires that rar.exe and par2.exe (par2cmdline) are installed on your system and the paths to the executables are specified in the nxg-upper.conf.
-The required executables can be downloaded here:
+- For creating rar archives NxG Upper requires that rar.exe is installed on your system.
+- For creating par2 files NxG Upper requires that either par2.exe (par2cmdline) or parpar.exe is installed on your system.
 
-- par2: https://github.com/animetosho/par2cmdline-turbo/releases
+The paths to the executables have to be specified in the nxg-upper.conf configuration file.
+
+The required executables can be downloaded here:
 - rar: https://www.rarlab.com/download.htm
+- par2: https://github.com/animetosho/par2cmdline-turbo/releases
+- parpar: https://github.com/animetosho/ParPar/releases
 
 ## Installation
 1. Download the executable file for your system from the release page.

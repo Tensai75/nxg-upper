@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"io/fs"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -34,19 +35,51 @@ func parFolder(path string, parBlockSize int64) error {
 		return err
 	}
 
+	// detect par executable
+	parExe := filepath.Base(conf.Par2Exe)
+	parExeFileName := strings.ToLower(parExe[:len(parExe)-len(filepath.Ext(parExe))])
+
 	// set parameters
-	parameters = append(parameters, "create", "-l")
-	parameters = append(parameters, fmt.Sprintf("-s%v", parBlockSize))
-	parameters = append(parameters, fmt.Sprintf("-r%v", conf.Redundancy))
-	parameters = append(parameters, fmt.Sprintf("%v", filepath.Join(path, shortHeader)))
-	parameters = append(parameters, fmt.Sprintf("%v", filepath.Join(path, "*.*")))
+	switch parExeFileName {
+	case "par2":
+		parameters = append(parameters, "create", "-l")
+		parameters = append(parameters, fmt.Sprintf("-s%v", parBlockSize))
+		parameters = append(parameters, fmt.Sprintf("-r%v", conf.Redundancy))
+		parameters = append(parameters, fmt.Sprintf("%v", filepath.Join(path, shortHeader)))
+		parameters = append(parameters, fmt.Sprintf("%v", filepath.Join(path, "*.*")))
+	case "parpar":
+		parameters = append(parameters, fmt.Sprintf("-p%vB", conf.VolumeSize))
+		parameters = append(parameters, fmt.Sprintf("-s%vB", parBlockSize))
+		parameters = append(parameters, fmt.Sprintf("-r%v%%", conf.Redundancy))
+		parameters = append(parameters, fmt.Sprintf("-o%v", filepath.Join(path, shortHeader+".par2")))
+		if err = filepath.WalkDir(path, func(filePath string, dir fs.DirEntry, err error) error {
+			if err != nil {
+				return err
+			}
+			if !dir.IsDir() {
+				parameters = append(parameters, filePath)
+			}
+			return nil
+		}); err != nil {
+			return fmt.Errorf("Error while walking path \"%v\": %v", path, err)
+		}
+	default:
+		return fmt.Errorf("Unknown par executable: %s", conf.Par2Exe)
+	}
 
 	cmd := exec.Command(conf.Par2Exe, parameters...)
 	Log.Debug("Par command: %s", cmd.String())
 	if conf.Debug || conf.Verbose > 0 {
 		// create a pipe for the output of the program
-		if cmdReader, err = cmd.StdoutPipe(); err != nil {
-			return err
+		switch parExeFileName {
+		case "par2":
+			if cmdReader, err = cmd.StdoutPipe(); err != nil {
+				return err
+			}
+		case "parpar":
+			if cmdReader, err = cmd.StderrPipe(); err != nil {
+				return err
+			}
 		}
 		scanner = bufio.NewScanner(cmdReader)
 		scanner.Split(scanLines)

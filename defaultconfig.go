@@ -53,7 +53,9 @@ RarExe: "C:\\Tools\\Rar\\rar.exe"
 MakePar2: true
 # Redundancy in %
 Redundancy: 10
-# Absolute path to par2cmdline exe (https://github.com/animetosho/par2cmdline-turbo/releases)
+# Absolute path to par exe
+# either par2(.exe) (https://github.com/animetosho/par2cmdline-turbo/releases)
+# or parpar(.exe) (https://github.com/animetosho/ParPar/releases)
 Par2Exe: "C:\\Tools\\Par2\\par2.exe"
 
 # Path settings
