@@ -68,7 +68,7 @@ func filePoster(wg *sync.WaitGroup) {
 				// prepare the nzbFile
 				var nzbFile nzbparser.NzbFile
 				file.nzb.Files = append(file.nzb.Files, nzbFile)
-				file.nzb.Files[file.fileNo-1].Groups = append(file.groups)
+				file.nzb.Files[file.fileNo-1].Groups = append(file.nzb.Files[file.fileNo-1].Groups, file.groups...)
 				file.nzb.Files[file.fileNo-1].Poster = file.poster
 				file.nzb.Files[file.fileNo-1].Filename = fileName
 
