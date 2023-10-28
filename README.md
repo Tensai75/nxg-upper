@@ -73,6 +73,12 @@ This is a Proof of Concept with the minimum necessary features.
 So there is certainly a lot left to do.
 
 ## Version history
+### beta 3
+- include parpar as an alternative par2 executable
+- change progressbar from parts to uploaded bytes and include bitrate
+- bug fix for appending groups to nzb file
+- bug fix for re-adding failed articles blocking the queue
+
 ### beta 2
 - reduce NxG Header to 28 bytes for better compatibility with the search engines
 
