@@ -92,7 +92,7 @@ func poster(wg *sync.WaitGroup, connNumber int, retries int) {
 						article.Nzb.Files[article.FileNo-1].Segments = append(article.Nzb.Files[article.FileNo-1].Segments, *article.Segment)
 						postedMessages.inc()
 						if conf.Verbose > 0 {
-							uploadProgressBar.Add(1)
+							uploadProgressBar.Add(article.Segment.Bytes)
 						}
 					}
 				}

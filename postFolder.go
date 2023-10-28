@@ -84,7 +84,10 @@ func folderPoster(path string) error {
 
 	// progress bar
 	if conf.Verbose > 0 {
-		uploadProgressBar = progressbar.NewOptions(int(totalDataParts+totalParParts),
+		// the total upload size is an approximation with an estimated overhead of 4% (yEnc and headers)
+		totalUploadSize := int((totalDataParts + totalParParts) * conf.ArticleSize * 104 / 100)
+		uploadProgressBar = progressbar.NewOptions(totalUploadSize,
+			progressbar.OptionShowBytes(true),
 			progressbar.OptionSetDescription("INFO:    Uploading    "),
 			progressbar.OptionSetRenderBlankState(true),
 			progressbar.OptionThrottle(time.Millisecond*100),
