@@ -39,7 +39,7 @@ type Args struct {
 	Encrypt            bool   `arg:"-"`
 	Encrypt_arg        string `arg:"--encrypt" help:"Encrypt the rar file with a password" placeholder:"true|false"`
 	Password           string `arg:"--password" help:"Password for the rar file" placeholder:"STRING"`
-	PasswordLength     int    `arg:"--password" help:"Length of the random password for the rar file" placeholder:"NUMBER"`
+	PasswordLength     int    `arg:"--passwordlength" help:"Length of the random password for the rar file" placeholder:"NUMBER"`
 	Compression        int    `arg:"--compression" help:"Compression level for rar file" placeholder:"0-9"`
 	RarExe             string `arg:"--rarexe" help:"Path to the rar executable" placeholder:"PATH"`
 	MakePar2           bool   `arg:"-"`
