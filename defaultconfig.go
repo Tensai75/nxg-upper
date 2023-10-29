@@ -28,6 +28,8 @@ LineLength: 128
 ArticleSize: 768000
 # Poster (From address) for the articles (leave empty for random poster)
 Poster: ""
+# Obfuscate the upload
+Obfuscate: true
 # Number of retries before article posting fails
 Retries: 3
 

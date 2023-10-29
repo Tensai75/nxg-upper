@@ -49,7 +49,13 @@ func articlePoster(wg *sync.WaitGroup) {
 				segment.Id = md5Hash[:40] + "@" + md5Hash[40:61] + "." + md5Hash[61:]
 
 				article.Header = make(map[string][]string)
-				article.Header["Subject"] = append(article.Header["Subject"], fmt.Sprintf("[%v/%v] %v - \"%s\" yEnc (%v/%v)", chunk.FileNumber, chunk.TotalFiles, nzb.Comment, chunk.Filename, chunk.PartNumber, chunk.TotalParts))
+				subject := ""
+				if conf.Obfuscate {
+					subject = md5Hash
+				} else {
+					subject = fmt.Sprintf("[%v/%v] %v - \"%s\" yEnc (%v/%v)", chunk.FileNumber, chunk.TotalFiles, nzb.Comment, chunk.Filename, chunk.PartNumber, chunk.TotalParts)
+				}
+				article.Header["Subject"] = append(article.Header["Subject"], subject)
 				article.Header["Date"] = append(article.Header["Date"], time.Now().Format(time.RFC1123))
 				article.Header["From"] = append(article.Header["From"], conf.Poster)
 				article.Header["Message-ID"] = append(article.Header["Message-ID"], "<"+segment.Id+">")

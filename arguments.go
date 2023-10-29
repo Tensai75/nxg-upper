@@ -28,6 +28,8 @@ type Args struct {
 	ArticleSize        int64  `arg:"--articlesize" help:"Size of the article body in bytes" placeholder:"BYTES"`
 	Retries            int    `arg:"--retries" help:"Number of retries before article posting fails" placeholder:"INT"`
 	Poster             string `arg:"--poster" help:"Poster (From address) for the articles (leave empty for random poster)" placeholder:"EMAIL"`
+	Obfuscate          bool   `arg:"-"`
+	Obfuscate_arg      string `arg:"--obfuscate" help:"Obfuscate the upload" placeholder:"true|false"`
 	MakeRar            bool   `arg:"-"`
 	MakeRar_arg        string `arg:"--rar" help:"Make rar archive" placeholder:"true|false"`
 	MakeVolumes        bool   `arg:"-"`
@@ -193,6 +195,13 @@ func checkArguments() {
 			conf.Debug = true
 		} else if conf.Debug_arg == "false" {
 			conf.Debug = false
+		}
+	}
+	if conf.Obfuscate_arg != "" {
+		if conf.Obfuscate_arg == "true" {
+			conf.Obfuscate = true
+		} else if conf.Obfuscate_arg == "false" {
+			conf.Obfuscate = false
 		}
 	}
 }
