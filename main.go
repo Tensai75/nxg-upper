@@ -167,7 +167,7 @@ func main() {
 		if conf.Verbose > 0 {
 			uploadProgressBar.Finish()
 		}
-		Log.Info("Upload successful")
+		Log.Info("Upload successful with average upload speed at %s", averageBitrate.get())
 		// Update nzb
 		nzb.Meta = make(map[string]string)
 		nzb.Meta["Title"] = title

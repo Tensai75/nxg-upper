@@ -6,10 +6,42 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+	"sync"
 	"time"
 
 	progressbar "github.com/schollz/progressbar/v3"
 )
+
+type AverageBitrate struct {
+	sync.Mutex
+	startTime    time.Time
+	endTime      time.Time
+	bytes        int64
+	setStartTime sync.Once
+}
+
+func (a *AverageBitrate) start() {
+	a.setStartTime.Do(func() {
+		a.startTime = time.Now()
+		a.endTime = time.Now()
+	})
+}
+
+func (a *AverageBitrate) calc(size int64) string {
+	a.Lock()
+	defer a.Unlock()
+	a.endTime = time.Now()
+	a.bytes += size
+	return humanRate(float64(a.bytes) / float64(time.Duration.Seconds(a.endTime.Sub(a.startTime))))
+}
+
+func (a *AverageBitrate) get() string {
+	a.Lock()
+	defer a.Unlock()
+	return humanRate(float64(a.bytes) / float64(time.Duration.Seconds(a.endTime.Sub(a.startTime))))
+}
+
+var averageBitrate AverageBitrate
 
 func folderPoster(path string) error {
 
@@ -186,3 +218,17 @@ func calculateFolderTotalParParts(path string) (int64, error) {
 }
 
 func newline() { fmt.Println() }
+
+func humanRate(b float64) string {
+	const unit = 1000
+	if b < unit {
+		return fmt.Sprintf("%.1f B/s", b)
+	}
+	div, exp := int64(unit), 0
+	for n := b / unit; n >= unit; n /= unit {
+		div *= unit
+		exp++
+	}
+	return fmt.Sprintf("%.1f %cB/s",
+		float64(b)/float64(div), "KMGTPE"[exp])
+}

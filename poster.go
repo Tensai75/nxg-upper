@@ -78,6 +78,9 @@ func poster(wg *sync.WaitGroup, connNumber int, retries int) {
 					return // Error somewhere, terminate
 				default: // Default is must to avoid blocking
 
+					// start bitrate timer
+					averageBitrate.start()
+
 					if err = post(conn, &article.Article); err != nil {
 						Log.Debug("Error posting message no %v of file \"%s\": %v", article.Segment.Number, article.Nzb.Files[article.FileNo-1].Filename, err)
 						article.Retries++
@@ -91,6 +94,7 @@ func poster(wg *sync.WaitGroup, connNumber int, retries int) {
 						article.Nzb.Files[article.FileNo-1].Date = int(time.Now().Unix())
 						article.Nzb.Files[article.FileNo-1].Segments = append(article.Nzb.Files[article.FileNo-1].Segments, *article.Segment)
 						postedMessages.inc()
+						averageBitrate.calc(int64(article.Segment.Bytes))
 						if conf.Verbose > 0 {
 							uploadProgressBar.Add(article.Segment.Bytes)
 						}
