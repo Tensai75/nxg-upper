@@ -37,6 +37,7 @@ type Args struct {
 	Encrypt            bool   `arg:"-"`
 	Encrypt_arg        string `arg:"--encrypt" help:"Encrypt the rar file with a password" placeholder:"true|false"`
 	Password           string `arg:"--password" help:"Password for the rar file" placeholder:"STRING"`
+	PasswordLength     int    `arg:"--password" help:"Length of the random password for the rar file" placeholder:"NUMBER"`
 	Compression        int    `arg:"--compression" help:"Compression level for rar file" placeholder:"0-9"`
 	RarExe             string `arg:"--rarexe" help:"Path to the rar executable" placeholder:"PATH"`
 	MakePar2           bool   `arg:"-"`
@@ -126,6 +127,9 @@ func checkArguments() {
 		if conf.NzbPath, err = filepath.Abs(filepath.Join(homePath, conf.NzbPath)); err != nil {
 			checkForFatalErr(fmt.Errorf("Unable to determine NZB file path: %v", err))
 		}
+	}
+	if conf.PasswordLength == 0 {
+		conf.PasswordLength = 25
 	}
 	/*
 		if !filepath.IsAbs(conf.FaildArticles) {

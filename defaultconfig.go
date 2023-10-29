@@ -37,6 +37,8 @@ MakeRar: true
 # Encrypt rar file with a password if set to true. If no password is provided with flag --password a random password is generated
 # If set to false, the rar file will nevertheless be encrypted if flag --password is provided
 Encrypt: true
+# Length of the random password
+PasswordLength: 25
 # Compression level from 0 to 9 (0 = no compression / 9 = max. compression)
 Compression: 0
 # Make volumes if set to true

@@ -36,7 +36,7 @@ func rarFolder(path string, tempPath string, folderSize int64) error {
 	parameters = append(parameters, fmt.Sprintf("-m%v", conf.Compression))
 	if conf.Encrypt || conf.Password != "" {
 		if conf.Password == "" {
-			conf.Password = randomString(30, 0, false)
+			conf.Password = randomString(conf.PasswordLength, 0, true)
 		}
 		parameters = append(parameters, fmt.Sprintf("-hp%v", conf.Password))
 	}
