@@ -267,6 +267,9 @@ func exit(exitCode int, exitErr error) {
 	if exitCode > 0 {
 		Log.Error("%v", exitErr)
 	} else {
+		Log.Debug("Header: %s", nzb.Comment)
+		Log.Debug("Password: %s", conf.Password)
+		Log.Debug("NZB File: %s", filepath.Join(conf.NzbPath, filepath.Base(conf.Path)+".nzb"))
 		fmt.Println(nzb.Comment, conf.Password)
 	}
 	os.Exit(exitCode)
