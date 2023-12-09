@@ -73,6 +73,13 @@ This is a Proof of Concept with the minimum necessary features.
 So there is certainly a lot left to do.
 
 ## Version history
+### beta 4
+- updated dependencies
+- fixed build script
+- new option "Obfuscate" to obfuscate the message subject
+- new option "PasswordLength" to set the length of the generated password
+- some refactoring and additional debug output for scripting purposes
+
 ### beta 3
 - include parpar as an alternative par2 executable
 - change progressbar from parts to uploaded bytes and include bitrate
