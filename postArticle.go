@@ -31,16 +31,22 @@ func articlePoster(wg *sync.WaitGroup) {
 				return // Error somewhere, terminate
 			default: // Default is must to avoid blocking
 
-				var segment nzbparser.NzbSegment
-				var article nntp.Article
-				var partType string
-				var partNumber int64
+				var (
+					segment           nzbparser.NzbSegment
+					article           nntp.Article
+					partType          string
+					partNumber        int64
+					totalDownloadSize int64
+					nxgHeader         string
+				)
 
 				if filepath.Ext(chunk.Filename) == ".par2" {
 					partType = "par2"
+					totalDownloadSize = totalParSize
 					partNumber = parPartCounter.inc()
 				} else {
 					partType = "data"
+					totalDownloadSize = totalDataSize
 					partNumber = dataPartCounter.inc()
 				}
 
@@ -55,12 +61,19 @@ func articlePoster(wg *sync.WaitGroup) {
 				} else {
 					subject = fmt.Sprintf("[%v/%v] %v - \"%s\" yEnc (%v/%v)", chunk.FileNumber, chunk.TotalFiles, nzb.Comment, chunk.Filename, chunk.PartNumber, chunk.TotalParts)
 				}
+
+				//x-nxg header
+				if nxgHeader, err = encrypt(fmt.Sprintf("%v:%v:%v:%v:%v", chunk.FileNumber, chunk.TotalFiles, chunk.Filename, partType, totalDownloadSize), nzb.Comment); err != nil {
+					Log.Warn("Unable to encrypt NxG header: %v", err)
+				}
+
 				article.Header["Subject"] = append(article.Header["Subject"], subject)
 				article.Header["Date"] = append(article.Header["Date"], time.Now().Format(time.RFC1123))
 				article.Header["From"] = append(article.Header["From"], conf.Poster)
 				article.Header["Message-ID"] = append(article.Header["Message-ID"], "<"+segment.Id+">")
 				article.Header["Path"] = append(article.Header["Path"], "")
 				article.Header["Newsgroups"] = append(article.Header["Groups"], strings.Join(chunk.Nzb.Files[chunk.FileNumber-1].Groups, ","))
+				article.Header["X-NxG"] = append(article.Header["X-NxG"], nxgHeader)
 				article.Body = &chunk.Part
 
 				segment.Bytes = chunk.Part.Len()

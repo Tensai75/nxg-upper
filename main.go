@@ -79,7 +79,9 @@ var (
 	title             string
 	shortHeader       string
 	totalDataParts    int64
+	totalDataSize     int64
 	totalParParts     int64
+	totalParSize      int64
 	uploadProgressBar *progressbar.ProgressBar
 	fatalError        sync.Once
 	err               error

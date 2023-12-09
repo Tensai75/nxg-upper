@@ -46,11 +46,15 @@ var averageBitrate AverageBitrate
 func folderPoster(path string) error {
 
 	var (
-		folderSize   int64
 		parBlockSize int64
 		inputFiles   []string
 		err          error
 	)
+
+	if totalDataSize, err = calculateFolderSize(path, ""); err != nil {
+		return err
+	}
+	Log.Debug("Total data size: %v Bytes", totalDataSize)
 
 	if conf.MakeRar {
 		tempPath = filepath.Join(conf.TempPath, shortHeader)
@@ -58,10 +62,7 @@ func folderPoster(path string) error {
 			return err
 		}
 		Log.Debug("Temp path set to: %v", tempPath)
-		if folderSize, err = calculateFolderSize(path); err != nil {
-			return err
-		}
-		if err = rarFolder(path, tempPath, folderSize); err != nil {
+		if err = rarFolder(path, tempPath, totalDataSize); err != nil {
 			return err
 		}
 	} else {
@@ -69,14 +70,15 @@ func folderPoster(path string) error {
 	}
 
 	if conf.MakePar2 {
-		if folderSize, err = calculateFolderSize(tempPath); err != nil {
-			return err
-		}
-		parBlockSize = calculateParBlockSize(folderSize)
+		parBlockSize = calculateParBlockSize(totalDataSize)
 		Log.Debug("Par block size: %v Bytes", parBlockSize)
 		if err = parFolder(tempPath, parBlockSize); err != nil {
 			return err
 		}
+		if totalParSize, err = calculateFolderSize(tempPath, ".par2"); err != nil {
+			return err
+		}
+		Log.Debug("Total par size: %v Bytes", totalParSize)
 	}
 
 	Log.Debug("Upload path: %v", tempPath)
@@ -161,14 +163,16 @@ func folderPoster(path string) error {
 
 }
 
-func calculateFolderSize(path string) (int64, error) {
+func calculateFolderSize(path string, extension string) (int64, error) {
 	var size int64
-	if err = filepath.Walk(path, func(_ string, info os.FileInfo, err error) error {
+	if err = filepath.Walk(path, func(file string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
 		if !info.IsDir() {
-			size += info.Size()
+			if extension == "" || filepath.Ext(file) == extension {
+				size += info.Size()
+			}
 		}
 		return nil
 	}); err != nil {
