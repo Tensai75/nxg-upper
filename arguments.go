@@ -130,6 +130,11 @@ func checkArguments() {
 			checkForFatalErr(fmt.Errorf("Unable to determine NZB file path: %v", err))
 		}
 	}
+	if !filepath.IsAbs(conf.LogFilePath) {
+		if conf.LogFilePath, err = filepath.Abs(filepath.Join(homePath, conf.LogFilePath)); err != nil {
+			checkForFatalErr(fmt.Errorf("Unable to determine log file path: %v", err))
+		}
+	}
 	if conf.PasswordLength == 0 {
 		conf.PasswordLength = 25
 	}
