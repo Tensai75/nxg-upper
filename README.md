@@ -73,6 +73,11 @@ This is a Proof of Concept with the minimum necessary features.
 So there is certainly a lot left to do.
 
 ## Version history
+### beta 5
+- bug fix: use explicit file names for par2 [fixes https://github.com/Tensai75/nxg-upper/issues/1]
+- bug fix: make LogFilePath relative to home if not absolute
+- bug fix: make CsvPath relative to home if not absolute
+
 ### beta 4
 - updated dependencies
 - fixed build script
