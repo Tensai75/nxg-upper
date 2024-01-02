@@ -135,6 +135,11 @@ func checkArguments() {
 			checkForFatalErr(fmt.Errorf("Unable to determine log file path: %v", err))
 		}
 	}
+	if !filepath.IsAbs(conf.CsvPath) {
+		if conf.CsvPath, err = filepath.Abs(filepath.Join(homePath, conf.CsvPath)); err != nil {
+			checkForFatalErr(fmt.Errorf("Unable to determine csv file path: %v", err))
+		}
+	}
 	if conf.PasswordLength == 0 {
 		conf.PasswordLength = 25
 	}
