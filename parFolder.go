@@ -46,25 +46,25 @@ func parFolder(path string, parBlockSize int64) error {
 		parameters = append(parameters, fmt.Sprintf("-s%v", parBlockSize))
 		parameters = append(parameters, fmt.Sprintf("-r%v", conf.Redundancy))
 		parameters = append(parameters, fmt.Sprintf("%v", filepath.Join(path, shortHeader)))
-		parameters = append(parameters, fmt.Sprintf("%v", filepath.Join(path, "*.*")))
 	case "parpar":
 		parameters = append(parameters, fmt.Sprintf("-p%vB", conf.VolumeSize))
 		parameters = append(parameters, fmt.Sprintf("-s%vB", parBlockSize))
 		parameters = append(parameters, fmt.Sprintf("-r%v%%", conf.Redundancy))
 		parameters = append(parameters, fmt.Sprintf("-o%v", filepath.Join(path, shortHeader+".par2")))
-		if err = filepath.WalkDir(path, func(filePath string, dir fs.DirEntry, err error) error {
-			if err != nil {
-				return err
-			}
-			if !dir.IsDir() {
-				parameters = append(parameters, filePath)
-			}
-			return nil
-		}); err != nil {
-			return fmt.Errorf("Error while walking path \"%v\": %v", path, err)
-		}
 	default:
 		return fmt.Errorf("Unknown par executable: %s", conf.Par2Exe)
+	}
+
+	if err = filepath.WalkDir(path, func(filePath string, dir fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+		if !dir.IsDir() {
+			parameters = append(parameters, filePath)
+		}
+		return nil
+	}); err != nil {
+		return fmt.Errorf("Error while walking path \"%v\": %v", path, err)
 	}
 
 	cmd := exec.Command(conf.Par2Exe, parameters...)
