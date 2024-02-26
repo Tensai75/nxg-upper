@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"crypto/md5"
 	"fmt"
 	"hash/crc32"
 	"math"
@@ -35,10 +36,23 @@ func yEncEncoder(wg *sync.WaitGroup) {
 				// Open a byte writer
 				var outputChunk bytes.Buffer
 
+				// obfuscate yenc file name if activated
+				filename := ""
+				if conf.ObfuscateYenc {
+					hasher := md5.New()
+					hasher.Write([]byte(fmt.Sprintf("%s%d", chunk.Filename, chunk.PartNumber)))
+					filename = fmt.Sprintf("%x", hasher.Sum(nil))
+				} else {
+					filename = chunk.Filename
+				}
+
 				// Write yEnc part header
 				header := fmt.Sprintf("=ybegin part=%d total=%d line=%d size=%d name=%s\r\n",
-					chunk.PartNumber, chunk.TotalParts, conf.LineLength, chunk.TotalSize, chunk.Filename)
+					chunk.PartNumber, chunk.TotalParts, conf.LineLength, chunk.TotalSize, filename)
 				_, err := outputChunk.WriteString(header)
+				if err != nil {
+					checkForFatalErr(fmt.Errorf("Error writing yEnc header for part %d: %v\r\n", chunk.PartNumber, err))
+				}
 				partHeader := fmt.Sprintf("=ypart begin=%d end=%d size=%d\r\n",
 					chunk.StartByte, chunk.EndByte, chunk.PartSize)
 				_, err = outputChunk.WriteString(partHeader)

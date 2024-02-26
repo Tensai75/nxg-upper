@@ -30,6 +30,8 @@ type Args struct {
 	Poster             string `arg:"--poster" help:"Poster (From address) for the articles (leave empty for random poster)" placeholder:"EMAIL"`
 	Obfuscate          bool   `arg:"-"`
 	Obfuscate_arg      string `arg:"--obfuscate" help:"Obfuscate the upload" placeholder:"true|false"`
+	ObfuscateYenc      bool   `arg:"-"`
+	ObfuscateYenc_arg  string `arg:"--obfuscate" help:"Obfuscate also the yenc header" placeholder:"true|false"`
 	MakeRar            bool   `arg:"-"`
 	ObfuscateRar       bool   `arg:"-"`
 	MakeRar_arg        string `arg:"--rar" help:"Make rar archive" placeholder:"true|false"`
@@ -221,6 +223,13 @@ func checkArguments() {
 			conf.Obfuscate = true
 		} else if conf.Obfuscate_arg == "false" {
 			conf.Obfuscate = false
+		}
+	}
+	if conf.ObfuscateYenc_arg != "" {
+		if conf.ObfuscateYenc_arg == "true" {
+			conf.ObfuscateYenc = true
+		} else if conf.ObfuscateYenc_arg == "false" {
+			conf.ObfuscateYenc = false
 		}
 	}
 }

@@ -84,7 +84,7 @@ func articlePoster(wg *sync.WaitGroup) {
 				article.Header["Message-ID"] = append(article.Header["Message-ID"], "<"+segment.Id+">")
 				article.Header["Path"] = append(article.Header["Path"], "")
 				article.Header["Newsgroups"] = append(article.Header["Groups"], strings.Join(chunk.Nzb.Files[chunk.FileNumber-1].Groups, ","))
-				article.Header["X-NxG"] = append(article.Header["X-NxG"], nxgHeader)
+				article.Header["X-Nxg"] = append(article.Header["X-Nxg"], nxgHeader)
 				article.Body = &chunk.Part
 
 				segment.Bytes = chunk.Part.Len()

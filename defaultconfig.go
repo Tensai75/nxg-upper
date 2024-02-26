@@ -30,6 +30,8 @@ ArticleSize: 768000
 Poster: ""
 # Obfuscate the upload
 Obfuscate: false
+# Obfuscate also the yenc header
+ObfuscateYenc: false
 # Number of retries before article posting fails
 Retries: 3
 
