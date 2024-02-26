@@ -31,11 +31,13 @@ type Args struct {
 	Obfuscate          bool   `arg:"-"`
 	Obfuscate_arg      string `arg:"--obfuscate" help:"Obfuscate the upload" placeholder:"true|false"`
 	ObfuscateYenc      bool   `arg:"-"`
-	ObfuscateYenc_arg  string `arg:"--obfuscate" help:"Obfuscate also the yenc header" placeholder:"true|false"`
+	ObfuscateYenc_arg  string `arg:"--obfuscateyenc" help:"Obfuscate also the yenc header" placeholder:"true|false"`
+	HeaderCheck        bool   `arg:"-"`
+	HeaderCheck_arg    string `arg:"--headercheck" help:"Activate header check" placeholder:"true|false"`
 	MakeRar            bool   `arg:"-"`
-	ObfuscateRar       bool   `arg:"-"`
 	MakeRar_arg        string `arg:"--rar" help:"Make rar archive" placeholder:"true|false"`
-	ObfuscateRar_arg   string `arg:"--obfuscterar" help:"Obfuscate rar archive name" placeholder:"true|false"`
+	ObfuscateRar       bool   `arg:"-"`
+	ObfuscateRar_arg   string `arg:"--obfuscaterar" help:"Obfuscate rar archive name" placeholder:"true|false"`
 	MakeVolumes        bool   `arg:"-"`
 	MakeVolumes_arg    string `arg:"--makevolumes" help:"Create rar volumes" placeholder:"true|false"`
 	MaxVolumes         int64  `arg:"--maxvolumes" help:"Maximum amount of volumes" placeholder:"INT"`
@@ -230,6 +232,13 @@ func checkArguments() {
 			conf.ObfuscateYenc = true
 		} else if conf.ObfuscateYenc_arg == "false" {
 			conf.ObfuscateYenc = false
+		}
+	}
+	if conf.HeaderCheck_arg != "" {
+		if conf.HeaderCheck_arg == "true" {
+			conf.HeaderCheck = true
+		} else if conf.HeaderCheck_arg == "false" {
+			conf.HeaderCheck = false
 		}
 	}
 }

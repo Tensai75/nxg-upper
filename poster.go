@@ -81,7 +81,8 @@ func poster(wg *sync.WaitGroup, connNumber int, retries int) {
 					// start bitrate timer
 					averageBitrate.start()
 
-					if err = post(conn, &article.Article); err != nil {
+					articleToPost := article.Article
+					if err = post(conn, &articleToPost); err != nil {
 						Log.Debug("Error posting message no %v of file \"%s\": %v", article.Segment.Number, article.Nzb.Files[article.FileNo-1].Filename, err)
 						article.Retries++
 						if article.Retries <= conf.Retries {
@@ -91,6 +92,18 @@ func poster(wg *sync.WaitGroup, connNumber int, retries int) {
 							saveArticle(article)
 						}
 					} else {
+						if conf.HeaderCheck {
+							if _, err := conn.Head(article.Article.Header["Message-ID"][0]); err != nil {
+								Log.Debug("Header check failed for message no %v of file \"%s\": ", article.Segment.Number, article.Nzb.Files[article.FileNo-1].Filename)
+								article.Retries++
+								if article.Retries <= conf.Retries {
+									failedArticlesChan <- article
+								} else {
+									Log.Warn("After %d retries unable to post message no %v of file \"%s\": Header check failed", conf.Retries, article.Segment.Number, article.Nzb.Files[article.FileNo-1].Filename)
+									saveArticle(article)
+								}
+							}
+						}
 						article.Nzb.Files[article.FileNo-1].Date = int(time.Now().Unix())
 						article.Nzb.Files[article.FileNo-1].Segments = append(article.Nzb.Files[article.FileNo-1].Segments, *article.Segment)
 						postedMessages.inc()

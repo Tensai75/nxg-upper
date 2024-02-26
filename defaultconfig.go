@@ -32,6 +32,8 @@ Poster: ""
 Obfuscate: false
 # Obfuscate also the yenc header
 ObfuscateYenc: false
+# Activate header check
+HeaderCheck: false
 # Number of retries before article posting fails
 Retries: 3
 
