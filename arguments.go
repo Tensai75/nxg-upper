@@ -13,54 +13,56 @@ import (
 
 // arguments structure
 type Args struct {
-	Path               string `arg:"positional,required" help:"Path to be uploaded" placeholder:"PATH"`
-	Host               string `arg:"--host" help:"Usenet server host name or IP address" placeholder:"HOST"`
-	Port               int    `arg:"--port" help:"Usenet server port number" placeholder:"INT"`
-	SSL                bool   `arg:"-"`
-	SSL_arg            string `arg:"--ssl" help:"Use SSL" placeholder:"true|false"`
-	NntpUser           string `arg:"--user" help:"Username to connect to the usenet server" placeholder:"STRING"`
-	NntpPass           string `arg:"--pass" help:"Password to connect to the usenet server" placeholder:"STRING"`
-	Connections        int    `arg:"--connections" help:"Number of connections to use to connect to the usenet server" placeholder:"INT"`
-	ConnRetries        int    `arg:"--connretries" help:"Number of retries upon connection error" placeholder:"INT"`
-	ConnWaitTime       int    `arg:"--connwaittime" help:"Time to wait in seconds before trying to re-connect" placeholder:"INT"`
-	Groups             string `arg:"--groups" help:"List of groups (separated by commas) to post to" placeholder:"GROUPS"`
-	LineLength         int    `arg:"--linelength" help:"Line length of the yEnc encoded article body" placeholder:"INT"`
-	ArticleSize        int64  `arg:"--articlesize" help:"Size of the article body in bytes" placeholder:"BYTES"`
-	Retries            int    `arg:"--retries" help:"Number of retries before article posting fails" placeholder:"INT"`
-	Poster             string `arg:"--poster" help:"Poster (From address) for the articles (leave empty for random poster)" placeholder:"EMAIL"`
-	Obfuscate          bool   `arg:"-"`
-	Obfuscate_arg      string `arg:"--obfuscate" help:"Obfuscate the upload" placeholder:"true|false"`
-	ObfuscateYenc      bool   `arg:"-"`
-	ObfuscateYenc_arg  string `arg:"--obfuscateyenc" help:"Obfuscate also the yenc header" placeholder:"true|false"`
-	HeaderCheck        bool   `arg:"-"`
-	HeaderCheck_arg    string `arg:"--headercheck" help:"Activate header check" placeholder:"true|false"`
-	MakeRar            bool   `arg:"-"`
-	MakeRar_arg        string `arg:"--rar" help:"Make rar archive" placeholder:"true|false"`
-	ObfuscateRar       bool   `arg:"-"`
-	ObfuscateRar_arg   string `arg:"--obfuscaterar" help:"Obfuscate rar archive name" placeholder:"true|false"`
-	MakeVolumes        bool   `arg:"-"`
-	MakeVolumes_arg    string `arg:"--makevolumes" help:"Create rar volumes" placeholder:"true|false"`
-	MaxVolumes         int64  `arg:"--maxvolumes" help:"Maximum amount of volumes" placeholder:"INT"`
-	VolumeSize         int64  `arg:"--volumesize" help:"Minimum volume size in bytes" placeholder:"BYTES"`
-	Encrypt            bool   `arg:"-"`
-	Encrypt_arg        string `arg:"--encrypt" help:"Encrypt the rar file with a password" placeholder:"true|false"`
-	Password           string `arg:"--password" help:"Password for the rar file" placeholder:"STRING"`
-	PasswordLength     int    `arg:"--passwordlength" help:"Length of the random password for the rar file" placeholder:"NUMBER"`
-	Compression        int    `arg:"--compression" help:"Compression level for rar file" placeholder:"0-9"`
-	RarExe             string `arg:"--rarexe" help:"Path to the rar executable" placeholder:"PATH"`
-	MakePar2           bool   `arg:"-"`
-	MakePar2_arg       string `arg:"--par2" help:"Make par2 files" placeholder:"true|false"`
-	Redundancy         int    `arg:"--redundancy" help:"Redundancy in %" placeholder:"0-100"`
-	Par2Exe            string `arg:"--parexe" help:"Path to the par executable (either par2 [par2cmdline] or parpar)" placeholder:"PATH"`
-	CsvPath            string `arg:"--csvpath" help:"CSV file path to log title, header, password, groups and date (leave empty too disable)" placeholder:"PATH"`
-	CsvDelimiter       string `arg:"--csvdelimiter" help:"CSV file delimiter" placeholder:"STRING"`
-	DelTempFolder      bool   `arg:"-"`
-	DelTempFolder_arg  string `arg:"--deltemp" help:"Delete temp folder at program end" placeholder:"true|false"`
-	DelInputFolder     bool   `arg:"-"`
-	DelInputFolder_arg string `arg:"--delinput" help:"Delete input folder after successful upload" placeholder:"true|false"`
-	TempPath           string `arg:"--tmp" help:"Temporary path for rar/par2" placeholder:"PATH"`
-	LogFilePath        string `arg:"--log" help:"Path where to save the log file" placeholder:"PATH"`
-	NzbPath            string `arg:"--nzb" help:"Path where to save the NZB file" placeholder:"PATH"`
+	Path                string `arg:"positional,required" help:"Path to be uploaded" placeholder:"PATH"`
+	Host                string `arg:"--host" help:"Usenet server host name or IP address" placeholder:"HOST"`
+	Port                int    `arg:"--port" help:"Usenet server port number" placeholder:"INT"`
+	SSL                 bool   `arg:"-"`
+	SSL_arg             string `arg:"--ssl" help:"Use SSL" placeholder:"true|false"`
+	NntpUser            string `arg:"--user" help:"Username to connect to the usenet server" placeholder:"STRING"`
+	NntpPass            string `arg:"--pass" help:"Password to connect to the usenet server" placeholder:"STRING"`
+	Connections         int    `arg:"--connections" help:"Number of connections to use to connect to the usenet server" placeholder:"INT"`
+	ConnRetries         int    `arg:"--connretries" help:"Number of retries upon connection error" placeholder:"INT"`
+	ConnWaitTime        int    `arg:"--connwaittime" help:"Time to wait in seconds before trying to re-connect" placeholder:"INT"`
+	Groups              string `arg:"--groups" help:"List of groups (separated by commas) to post to" placeholder:"GROUPS"`
+	LineLength          int    `arg:"--linelength" help:"Line length of the yEnc encoded article body" placeholder:"INT"`
+	ArticleSize         int64  `arg:"--articlesize" help:"Size of the article body in bytes" placeholder:"BYTES"`
+	Retries             int    `arg:"--retries" help:"Number of retries before article posting fails" placeholder:"INT"`
+	Poster              string `arg:"--poster" help:"Poster (From address) for the articles (leave empty for random poster)" placeholder:"EMAIL"`
+	Obfuscate           bool   `arg:"-"`
+	Obfuscate_arg       string `arg:"--obfuscate" help:"Obfuscate the upload" placeholder:"true|false"`
+	ObfuscatePoster     bool   `arg:"-"`
+	ObfuscatePoster_arg string `arg:"--obfuscateposter" help:"Obfuscate also the poster (From address)" placeholder:"true|false"`
+	ObfuscateYenc       bool   `arg:"-"`
+	ObfuscateYenc_arg   string `arg:"--obfuscateyenc" help:"Obfuscate also the yenc header" placeholder:"true|false"`
+	HeaderCheck         bool   `arg:"-"`
+	HeaderCheck_arg     string `arg:"--headercheck" help:"Activate header check" placeholder:"true|false"`
+	MakeRar             bool   `arg:"-"`
+	MakeRar_arg         string `arg:"--rar" help:"Make rar archive" placeholder:"true|false"`
+	ObfuscateRar        bool   `arg:"-"`
+	ObfuscateRar_arg    string `arg:"--obfuscaterar" help:"Obfuscate rar archive name" placeholder:"true|false"`
+	MakeVolumes         bool   `arg:"-"`
+	MakeVolumes_arg     string `arg:"--makevolumes" help:"Create rar volumes" placeholder:"true|false"`
+	MaxVolumes          int64  `arg:"--maxvolumes" help:"Maximum amount of volumes" placeholder:"INT"`
+	VolumeSize          int64  `arg:"--volumesize" help:"Minimum volume size in bytes" placeholder:"BYTES"`
+	Encrypt             bool   `arg:"-"`
+	Encrypt_arg         string `arg:"--encrypt" help:"Encrypt the rar file with a password" placeholder:"true|false"`
+	Password            string `arg:"--password" help:"Password for the rar file" placeholder:"STRING"`
+	PasswordLength      int    `arg:"--passwordlength" help:"Length of the random password for the rar file" placeholder:"NUMBER"`
+	Compression         int    `arg:"--compression" help:"Compression level for rar file" placeholder:"0-9"`
+	RarExe              string `arg:"--rarexe" help:"Path to the rar executable" placeholder:"PATH"`
+	MakePar2            bool   `arg:"-"`
+	MakePar2_arg        string `arg:"--par2" help:"Make par2 files" placeholder:"true|false"`
+	Redundancy          int    `arg:"--redundancy" help:"Redundancy in %" placeholder:"0-100"`
+	Par2Exe             string `arg:"--parexe" help:"Path to the par executable (either par2 [par2cmdline] or parpar)" placeholder:"PATH"`
+	CsvPath             string `arg:"--csvpath" help:"CSV file path to log title, header, password, groups and date (leave empty too disable)" placeholder:"PATH"`
+	CsvDelimiter        string `arg:"--csvdelimiter" help:"CSV file delimiter" placeholder:"STRING"`
+	DelTempFolder       bool   `arg:"-"`
+	DelTempFolder_arg   string `arg:"--deltemp" help:"Delete temp folder at program end" placeholder:"true|false"`
+	DelInputFolder      bool   `arg:"-"`
+	DelInputFolder_arg  string `arg:"--delinput" help:"Delete input folder after successful upload" placeholder:"true|false"`
+	TempPath            string `arg:"--tmp" help:"Temporary path for rar/par2" placeholder:"PATH"`
+	LogFilePath         string `arg:"--log" help:"Path where to save the log file" placeholder:"PATH"`
+	NzbPath             string `arg:"--nzb" help:"Path where to save the NZB file" placeholder:"PATH"`
 	//	FaildArticles      string   `arg:"--faildarticles" help:"Path where to save failed articles"`
 	Verbose     int      `arg:"--verbose" help:"Verbosity level of cmd line output"  placeholder:"0-3"`
 	Debug       bool     `arg:"-"`
@@ -225,6 +227,13 @@ func checkArguments() {
 			conf.Obfuscate = true
 		} else if conf.Obfuscate_arg == "false" {
 			conf.Obfuscate = false
+		}
+	}
+	if conf.ObfuscatePoster_arg != "" {
+		if conf.ObfuscatePoster_arg == "true" {
+			conf.ObfuscatePoster = true
+		} else if conf.ObfuscatePoster_arg == "false" {
+			conf.ObfuscatePoster = false
 		}
 	}
 	if conf.ObfuscateYenc_arg != "" {

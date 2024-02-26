@@ -38,7 +38,7 @@ func yEncEncoder(wg *sync.WaitGroup) {
 
 				// obfuscate yenc file name if activated
 				filename := ""
-				if conf.ObfuscateYenc {
+				if conf.Obfuscate && conf.ObfuscateYenc {
 					hasher := md5.New()
 					hasher.Write([]byte(fmt.Sprintf("%s%d", chunk.Filename, chunk.PartNumber)))
 					filename = fmt.Sprintf("%x", hasher.Sum(nil))

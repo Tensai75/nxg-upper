@@ -30,6 +30,8 @@ ArticleSize: 768000
 Poster: ""
 # Obfuscate the upload
 Obfuscate: false
+# Obfuscate also the poster (From address)
+ObfuscatePoster: false
 # Obfuscate also the yenc header
 ObfuscateYenc: false
 # Activate header check

@@ -60,8 +60,6 @@ func articlePoster(wg *sync.WaitGroup) {
 				poster := ""
 				if conf.Obfuscate {
 					subject = GetSHA256Hash(md5Hash)
-					posterHash := GetSHA256Hash(subject)
-					poster = posterHash[10:25] + "@" + posterHash[30:45] + "." + posterHash[50:53]
 				} else {
 					if conf.ObfuscateRar {
 						filenameReplace := regexp.MustCompile(`^[^.]*(.*)$`)
@@ -70,6 +68,11 @@ func articlePoster(wg *sync.WaitGroup) {
 					} else {
 						subject = fmt.Sprintf("[%v/%v] %v - \"%s\" yEnc (%v/%v)", chunk.FileNumber, chunk.TotalFiles, nzb.Comment, chunk.Filename, chunk.PartNumber, chunk.TotalParts)
 					}
+				}
+				if conf.Obfuscate && conf.ObfuscatePoster {
+					posterHash := GetSHA256Hash(subject)
+					poster = posterHash[10:25] + "@" + posterHash[30:45] + "." + posterHash[50:53]
+				} else {
 					poster = conf.Poster
 				}
 
