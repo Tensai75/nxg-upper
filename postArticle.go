@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"sync"
 	"time"
@@ -62,7 +63,13 @@ func articlePoster(wg *sync.WaitGroup) {
 					posterHash := GetSHA256Hash(subject)
 					poster = posterHash[10:25] + "@" + posterHash[30:45] + "." + posterHash[50:53]
 				} else {
-					subject = fmt.Sprintf("[%v/%v] %v - \"%s\" yEnc (%v/%v)", chunk.FileNumber, chunk.TotalFiles, nzb.Comment, chunk.Filename, chunk.PartNumber, chunk.TotalParts)
+					if conf.ObfuscateRar {
+						filenameReplace := regexp.MustCompile(`^[^.]*(.*)$`)
+						filename := filenameReplace.ReplaceAllString(chunk.Filename, nzb.Comment+"$1")
+						subject = fmt.Sprintf("[%v/%v] \"%s\" yEnc (%v/%v)", chunk.FileNumber, chunk.TotalFiles, filename, chunk.PartNumber, chunk.TotalParts)
+					} else {
+						subject = fmt.Sprintf("[%v/%v] %v - \"%s\" yEnc (%v/%v)", chunk.FileNumber, chunk.TotalFiles, nzb.Comment, chunk.Filename, chunk.PartNumber, chunk.TotalParts)
+					}
 					poster = conf.Poster
 				}
 

@@ -43,7 +43,15 @@ func rarFolder(path string, tempPath string, folderSize int64) error {
 	if volumeSize > 0 {
 		parameters = append(parameters, fmt.Sprintf("-v%vb", volumeSize))
 	}
-	parameters = append(parameters, filepath.Join(tempPath, shortHeader+".rar"))
+
+	rarName := ""
+	if conf.ObfuscateRar {
+		rarName = shortHeader
+	} else {
+		rarName = filepath.Base(path)
+	}
+
+	parameters = append(parameters, filepath.Join(tempPath, rarName+".rar"))
 	parameters = append(parameters, filepath.Join(path, "*"))
 
 	cmd := exec.Command(conf.RarExe, parameters...)

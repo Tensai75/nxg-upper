@@ -36,6 +36,9 @@ Retries: 3
 # RAR settings
 # Make rar archive if set to true
 MakeRar: true
+# Obfuscate rar archive name if set to true
+# If set to false the base folder name will be used as rar file name
+ObfuscateRar: true
 # Encrypt rar file with a password if set to true. If no password is provided with flag --password a random password is generated
 # If set to false, the rar file will nevertheless be encrypted if flag --password is provided
 Encrypt: true

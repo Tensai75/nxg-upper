@@ -35,6 +35,13 @@ func parFolder(path string, parBlockSize int64) error {
 		return err
 	}
 
+	parName := ""
+	if conf.ObfuscateRar {
+		parName = shortHeader
+	} else {
+		parName = filepath.Base(conf.Path)
+	}
+
 	// detect par executable
 	parExe := filepath.Base(conf.Par2Exe)
 	parExeFileName := strings.ToLower(parExe[:len(parExe)-len(filepath.Ext(parExe))])
@@ -45,12 +52,12 @@ func parFolder(path string, parBlockSize int64) error {
 		parameters = append(parameters, "create", "-l")
 		parameters = append(parameters, fmt.Sprintf("-s%v", parBlockSize))
 		parameters = append(parameters, fmt.Sprintf("-r%v", conf.Redundancy))
-		parameters = append(parameters, fmt.Sprintf("%v", filepath.Join(path, shortHeader)))
+		parameters = append(parameters, fmt.Sprintf("%v", filepath.Join(path, parName)))
 	case "parpar":
 		parameters = append(parameters, fmt.Sprintf("-p%vB", conf.VolumeSize))
 		parameters = append(parameters, fmt.Sprintf("-s%vB", parBlockSize))
 		parameters = append(parameters, fmt.Sprintf("-r%v%%", conf.Redundancy))
-		parameters = append(parameters, fmt.Sprintf("-o%v", filepath.Join(path, shortHeader+".par2")))
+		parameters = append(parameters, fmt.Sprintf("-o%v", filepath.Join(path, parName+".par2")))
 	default:
 		return fmt.Errorf("Unknown par executable: %s", conf.Par2Exe)
 	}

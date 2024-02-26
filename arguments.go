@@ -31,7 +31,9 @@ type Args struct {
 	Obfuscate          bool   `arg:"-"`
 	Obfuscate_arg      string `arg:"--obfuscate" help:"Obfuscate the upload" placeholder:"true|false"`
 	MakeRar            bool   `arg:"-"`
+	ObfuscateRar       bool   `arg:"-"`
 	MakeRar_arg        string `arg:"--rar" help:"Make rar archive" placeholder:"true|false"`
+	ObfuscateRar_arg   string `arg:"--obfuscterar" help:"Obfuscate rar archive name" placeholder:"true|false"`
 	MakeVolumes        bool   `arg:"-"`
 	MakeVolumes_arg    string `arg:"--makevolumes" help:"Create rar volumes" placeholder:"true|false"`
 	MaxVolumes         int64  `arg:"--maxvolumes" help:"Maximum amount of volumes" placeholder:"INT"`
@@ -163,6 +165,13 @@ func checkArguments() {
 			conf.MakeRar = true
 		} else if conf.MakeRar_arg == "false" {
 			conf.MakeRar = false
+		}
+	}
+	if conf.ObfuscateRar_arg != "" {
+		if conf.ObfuscateRar_arg == "true" {
+			conf.ObfuscateRar = true
+		} else if conf.ObfuscateRar_arg == "false" {
+			conf.ObfuscateRar = false
 		}
 	}
 	if conf.MakeVolumes_arg != "" {
