@@ -56,10 +56,14 @@ func articlePoster(wg *sync.WaitGroup) {
 
 				article.Header = make(map[string][]string)
 				subject := ""
+				poster := ""
 				if conf.Obfuscate {
-					subject = md5Hash
+					subject = GetSHA256Hash(md5Hash)
+					posterHash := GetSHA256Hash(subject)
+					poster = posterHash[10:25] + "@" + posterHash[30:45] + "." + posterHash[50:53]
 				} else {
 					subject = fmt.Sprintf("[%v/%v] %v - \"%s\" yEnc (%v/%v)", chunk.FileNumber, chunk.TotalFiles, nzb.Comment, chunk.Filename, chunk.PartNumber, chunk.TotalParts)
+					poster = conf.Poster
 				}
 
 				//x-nxg header
@@ -69,7 +73,7 @@ func articlePoster(wg *sync.WaitGroup) {
 
 				article.Header["Subject"] = append(article.Header["Subject"], subject)
 				article.Header["Date"] = append(article.Header["Date"], time.Now().Format(time.RFC1123))
-				article.Header["From"] = append(article.Header["From"], conf.Poster)
+				article.Header["From"] = append(article.Header["From"], poster)
 				article.Header["Message-ID"] = append(article.Header["Message-ID"], "<"+segment.Id+">")
 				article.Header["Path"] = append(article.Header["Path"], "")
 				article.Header["Newsgroups"] = append(article.Header["Groups"], strings.Join(chunk.Nzb.Files[chunk.FileNumber-1].Groups, ","))
