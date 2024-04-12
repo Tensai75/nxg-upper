@@ -93,7 +93,7 @@ func poster(wg *sync.WaitGroup, connNumber int, retries int) {
 						}
 					} else {
 						if conf.HeaderCheck {
-							if _, err := conn.Head(article.Article.Header["Message-ID"][0]); err != nil {
+							if err := headerCheck(conn, &article); err != nil {
 								Log.Debug("Header check failed for message no %v of file \"%s\": ", article.Segment.Number, article.Nzb.Files[article.FileNo-1].Filename)
 								article.Retries++
 								if article.Retries <= conf.Retries {

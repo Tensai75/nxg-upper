@@ -16,8 +16,8 @@ var (
 func (c *safeConn) testPost(article *nntp.Article) error {
 	// for posting error testing
 	counter := testPostCounter.inc()
-	if counter%150 == 0 {
-		// return fmt.Errorf("Test Error")
+	if counter%75 == 0 {
+		return fmt.Errorf("test error")
 	}
 
 	return writeArticle(testPath, article)
@@ -38,10 +38,10 @@ func writeArticle(path string, article *nntp.Article) error {
 		}
 		return false
 	}))))
-	defer outputFile.Close()
 	if err != nil {
 		return err
 	}
+	defer outputFile.Close()
 	for output := range article.Header {
 		text := output + ": " + article.Header[output][0] + "\r\n"
 		if _, err = outputFile.Write([]byte(text)); err != nil {
@@ -64,4 +64,18 @@ func writeArticle(path string, article *nntp.Article) error {
 	savedMessages.inc()
 	return nil
 
+}
+
+func headerCheck(conn *safeConn, article *Article) error {
+	if conf.Test != "" {
+		// for posting error testing
+		counter := testPostCounter.inc()
+		if counter%100 == 0 {
+			return fmt.Errorf("test error")
+		}
+	} else {
+		_, err := conn.Head(article.Article.Header["Message-ID"][0])
+		return err
+	}
+	return nil
 }
