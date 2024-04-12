@@ -99,6 +99,7 @@ var (
 	yEncoderWG      sync.WaitGroup
 	articlePosterWG sync.WaitGroup
 	posterWG        sync.WaitGroup
+	chunksWG        sync.WaitGroup
 
 	// cancel context
 	ctx, cancel = context.WithCancel(context.Background())
@@ -157,12 +158,7 @@ func main() {
 	}
 
 	filePosterWG.Wait()
-	inputChunks.close()
-	yEncoderWG.Wait()
-	outputChunks.close()
-	articlePosterWG.Wait()
-	articles.close()
-	posterWG.Wait()
+	chunksWG.Wait()
 
 	// prevent execution if fatal error occurred
 	if ctx.Err() == nil {

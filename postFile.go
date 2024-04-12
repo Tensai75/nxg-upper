@@ -95,6 +95,7 @@ func filePoster(wg *sync.WaitGroup) {
 
 						file.nzb.Files[file.fileNo-1].Subject = fmt.Sprintf("[%v/%v] %s - \"%s\" yEnc (%v/%v)", file.fileNo, file.totalFiles, nzb.Comment, fileName, partNumber, totalParts)
 
+						chunksWG.Add(1)
 						inputChunks.Chan <- Chunk{
 							Filename:   fileName,
 							Checksum:   checksum,

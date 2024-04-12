@@ -2,33 +2,9 @@ package main
 
 import (
 	"fmt"
-	"runtime/debug"
 	"sync"
 	"time"
 )
-
-var failedArticlesChan = make(chan Article, 0)
-
-func init() {
-	go failedArticlesHandler()
-}
-
-func failedArticlesHandler() {
-	for {
-		article, ok := <-failedArticlesChan
-		if !ok {
-			return
-		}
-		go func(article Article) {
-			if err := TryCatch(func() { articles.Chan <- article })(); err != nil {
-				Log.Debug("Error while trying to add message no %v of file \"%s\" back to the queue: %v", article.Segment.Number, article.Nzb.Files[article.FileNo-1].Filename, err)
-				saveArticle(article)
-			} else {
-				Log.Debug("Added message no %v of file \"%s\" back to the queue", article.Segment.Number, article.Nzb.Files[article.FileNo-1].Filename)
-			}
-		}(article)
-	}
-}
 
 func poster(wg *sync.WaitGroup, connNumber int, retries int) {
 
@@ -86,7 +62,8 @@ func poster(wg *sync.WaitGroup, connNumber int, retries int) {
 						Log.Debug("Error posting message no %v of file \"%s\": %v", article.Segment.Number, article.Nzb.Files[article.FileNo-1].Filename, err)
 						article.Retries++
 						if article.Retries <= conf.Retries {
-							failedArticlesChan <- article
+							chunksWG.Add(1)
+							articles.Chan <- article
 						} else {
 							Log.Warn("After %d retries unable to post message no %v of file \"%s\": %v", conf.Retries, article.Segment.Number, article.Nzb.Files[article.FileNo-1].Filename, err)
 							saveArticle(article)
@@ -97,7 +74,8 @@ func poster(wg *sync.WaitGroup, connNumber int, retries int) {
 								Log.Debug("Header check failed for message no %v of file \"%s\": ", article.Segment.Number, article.Nzb.Files[article.FileNo-1].Filename)
 								article.Retries++
 								if article.Retries <= conf.Retries {
-									failedArticlesChan <- article
+									chunksWG.Add(1)
+									articles.Chan <- article
 								} else {
 									Log.Warn("After %d retries unable to post message no %v of file \"%s\": Header check failed", conf.Retries, article.Segment.Number, article.Nzb.Files[article.FileNo-1].Filename)
 									saveArticle(article)
@@ -112,21 +90,9 @@ func poster(wg *sync.WaitGroup, connNumber int, retries int) {
 							uploadProgressBar.Add(article.Segment.Bytes)
 						}
 					}
+					chunksWG.Done()
 				}
 			}
 		}
-	}
-}
-
-func TryCatch(f func()) func() error {
-	return func() (err error) {
-		defer func() {
-			if panicInfo := recover(); panicInfo != nil {
-				err = fmt.Errorf("%v, %s", panicInfo, string(debug.Stack()))
-				return
-			}
-		}()
-		f() // calling the decorated function
-		return err
 	}
 }
