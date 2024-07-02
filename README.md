@@ -73,6 +73,12 @@ This is a Proof of Concept with the minimum necessary features.
 So there is certainly a lot left to do.
 
 ## Version history
+### beta 7
+- heavy refactoring and bug fixes
+- implement new option for header check
+- use nntpPool instead of nntp
+- separate option for obfuscate poster
+
 ### beta 6
 - better obfuscation incl. poster
 - make rar file name obfuscation optional
