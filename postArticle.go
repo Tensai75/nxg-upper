@@ -7,23 +7,20 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/Tensai75/nntp"
-	"github.com/Tensai75/nzb-monkey-go/nzbparser"
+	"github.com/Tensai75/nzbparser"
 )
 
-func articlePoster(wg *sync.WaitGroup) {
-
-	defer wg.Done()
+func articlePoster() {
 
 	for {
 		select {
 		case <-ctx.Done():
 			return // Error somewhere, terminate
 		default: // Default is must to avoid blocking
-			chunk, ok := <-outputChunks.Chan
+			chunk, ok := <-outputChunksChan
 			if !ok {
 				return
 			}
@@ -37,9 +34,10 @@ func articlePoster(wg *sync.WaitGroup) {
 						segment           nzbparser.NzbSegment
 						article           nntp.Article
 						partType          string
-						partNumber        int64
-						totalDownloadSize int64
+						partNumber        uint64
+						totalDownloadSize uint64
 						nxgHeader         string
+						err               error
 					)
 
 					if filepath.Ext(chunk.Filename) == ".par2" {
@@ -62,7 +60,7 @@ func articlePoster(wg *sync.WaitGroup) {
 					if conf.Obfuscate {
 						subject = GetSHA256Hash(md5Hash)
 					} else {
-						if conf.ObfuscateRar {
+						if conf.MakeRar && conf.ObfuscateRar {
 							filenameReplace := regexp.MustCompile(`^[^.]*(.*)$`)
 							filename := filenameReplace.ReplaceAllString(chunk.Filename, nzb.Comment+"$1")
 							subject = fmt.Sprintf("[%v/%v] \"%s\" yEnc (%v/%v)", chunk.FileNumber, chunk.TotalFiles, filename, chunk.PartNumber, chunk.TotalParts)
@@ -97,7 +95,7 @@ func articlePoster(wg *sync.WaitGroup) {
 					}
 
 					chunksWG.Add(1)
-					articles.Chan <- Article{
+					articlesChan <- Article{
 						Segment: &segment,
 						Nzb:     chunk.Nzb,
 						Article: article,

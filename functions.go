@@ -5,7 +5,6 @@ import (
 	"crypto/cipher"
 	"crypto/rand"
 	"encoding/hex"
-	"errors"
 	"io"
 )
 
@@ -30,6 +29,7 @@ func encrypt(plaintext string, key string) (string, error) {
 	return hex.EncodeToString(gcm.Seal(nonce, nonce, []byte(plaintext), nil)), nil
 }
 
+/*
 func decrypt(ciphertextString string, keyString string) (string, error) {
 	ciphertext, err := hex.DecodeString(ciphertextString)
 	if err != nil {
@@ -56,3 +56,4 @@ func decrypt(ciphertextString string, keyString string) (string, error) {
 	decodedText, err := gcm.Open(nil, nonce, ciphertext, nil)
 	return string(decodedText), nil
 }
+*/

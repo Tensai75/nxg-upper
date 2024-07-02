@@ -6,14 +6,11 @@ import (
 	"fmt"
 	"hash/crc32"
 	"math"
-	"sync"
 
 	"golang.org/x/exp/slices"
 )
 
-func yEncEncoder(wg *sync.WaitGroup) {
-
-	defer wg.Done()
+func yEncEncoder() {
 
 	for {
 		select {
@@ -21,7 +18,7 @@ func yEncEncoder(wg *sync.WaitGroup) {
 			return // Error somewhere, terminate
 		default: // Default is must to avoid blocking
 
-			chunk, ok := <-inputChunks.Chan
+			chunk, ok := <-inputChunksChan
 			if !ok {
 				return
 			}
@@ -53,13 +50,13 @@ func yEncEncoder(wg *sync.WaitGroup) {
 						chunk.PartNumber, chunk.TotalParts, conf.LineLength, chunk.TotalSize, filename)
 					_, err := outputChunk.WriteString(header)
 					if err != nil {
-						checkForFatalErr(fmt.Errorf("Error writing yEnc header for part %d: %v\r\n", chunk.PartNumber, err))
+						checkForFatalErr(fmt.Errorf("error writing yEnc header for part %d: %v", chunk.PartNumber, err))
 					}
 					partHeader := fmt.Sprintf("=ypart begin=%d end=%d size=%d\r\n",
 						chunk.StartByte, chunk.EndByte, chunk.PartSize)
 					_, err = outputChunk.WriteString(partHeader)
 					if err != nil {
-						checkForFatalErr(fmt.Errorf("Error writing yEnc part header for part %d: %v\r\n", chunk.PartNumber, err))
+						checkForFatalErr(fmt.Errorf("error writing yEnc part header for part %d: %v", chunk.PartNumber, err))
 					}
 
 					specialChar := []byte{0x3D, 0x00, 0x0A, 0x0D, 0x7F}
@@ -98,12 +95,12 @@ func yEncEncoder(wg *sync.WaitGroup) {
 					}
 					_, err = outputChunk.WriteString(partFooter)
 					if err != nil {
-						checkForFatalErr(fmt.Errorf("Error to writing yEnc part footer for part %d: %v\r\n", chunk.PartNumber, err))
+						checkForFatalErr(fmt.Errorf("error to writing yEnc part footer for part %d: %v", chunk.PartNumber, err))
 					}
 
 					chunk.Part = outputChunk
 					chunksWG.Add(1)
-					outputChunks.Chan <- chunk
+					outputChunksChan <- chunk
 				}()
 			}
 		}

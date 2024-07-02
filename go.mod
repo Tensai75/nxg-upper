@@ -3,8 +3,9 @@ module github.com/Tensai75/nxg-upper
 go 1.21
 
 require (
-	github.com/Tensai75/nntp v0.0.0-20220306114527-c8bbbeefcca2
-	github.com/Tensai75/nzb-monkey-go v0.1.10
+	github.com/Tensai75/nntp v0.1.1
+	github.com/Tensai75/nntpPool v0.1.2
+	github.com/Tensai75/nzbparser v0.1.0
 	github.com/acarl005/stripansi v0.0.0-20180116102854-5a71ef0e047d
 	github.com/alexflint/go-arg v1.4.3
 	github.com/schollz/progressbar/v3 v3.13.1
@@ -13,6 +14,7 @@ require (
 )
 
 require (
+	github.com/Tensai75/subjectparser v0.1.0 // indirect
 	github.com/alexflint/go-scalar v1.2.0 // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
@@ -30,10 +32,10 @@ require (
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
-	golang.org/x/net v0.17.0 // indirect
-	golang.org/x/sys v0.13.0 // indirect
-	golang.org/x/term v0.13.0 // indirect
-	golang.org/x/text v0.13.0 // indirect
+	golang.org/x/net v0.25.0 // indirect
+	golang.org/x/sys v0.20.0 // indirect
+	golang.org/x/term v0.20.0 // indirect
+	golang.org/x/text v0.15.0 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

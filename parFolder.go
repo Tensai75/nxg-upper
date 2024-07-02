@@ -17,7 +17,7 @@ import (
 	"github.com/schollz/progressbar/v3"
 )
 
-func parFolder(path string, parBlockSize int64) error {
+func parFolder(path string, parBlockSize uint64) error {
 
 	Log.Info("Starting par process")
 
@@ -36,7 +36,7 @@ func parFolder(path string, parBlockSize int64) error {
 	}
 
 	parName := ""
-	if conf.ObfuscateRar {
+	if conf.MakeRar && conf.ObfuscateRar {
 		parName = shortHeader
 	} else {
 		parName = filepath.Base(conf.Path)
@@ -59,7 +59,7 @@ func parFolder(path string, parBlockSize int64) error {
 		parameters = append(parameters, fmt.Sprintf("-r%v%%", conf.Redundancy))
 		parameters = append(parameters, fmt.Sprintf("-o%v", filepath.Join(path, parName+".par2")))
 	default:
-		return fmt.Errorf("Unknown par executable: %s", conf.Par2Exe)
+		return fmt.Errorf("unknown par executable: %s", conf.Par2Exe)
 	}
 
 	if err = filepath.WalkDir(path, func(filePath string, dir fs.DirEntry, err error) error {
@@ -71,7 +71,7 @@ func parFolder(path string, parBlockSize int64) error {
 		}
 		return nil
 	}); err != nil {
-		return fmt.Errorf("Error while walking path \"%v\": %v", path, err)
+		return fmt.Errorf("error while walking path \"%v\": %v", path, err)
 	}
 
 	cmd := exec.Command(conf.Par2Exe, parameters...)
@@ -129,9 +129,9 @@ func parFolder(path string, parBlockSize int64) error {
 	return nil
 }
 
-func calculateParBlockSize(folderSize int64) int64 {
+func calculateParBlockSize(folderSize uint64) uint64 {
 
-	maxParBlocks := int64(32768)
+	maxParBlocks := uint64(32768)
 
 	if folderSize/conf.ArticleSize < maxParBlocks {
 		return conf.ArticleSize

@@ -26,9 +26,9 @@ Groups: "a.b.test"
 LineLength: 128
 # Size of the article body in bytes (will be adjusted to the nearest multiple of 64)
 ArticleSize: 768000
-# Poster (From address) for the articles (leave empty for random poster)
+# Poster (From address) for the articles (leave empty for random poster for each upload)
 Poster: ""
-# Obfuscate the upload
+# Obfuscate the subject of the upload
 Obfuscate: false
 # Obfuscate also the poster (From address)
 ObfuscatePoster: false
@@ -36,6 +36,10 @@ ObfuscatePoster: false
 ObfuscateYenc: false
 # Activate header check
 HeaderCheck: false
+# Header check delay in seconds
+HeaderCheckDelay: 5
+# Header check connections
+HeaderCheckConns: 5
 # Number of retries before article posting fails
 Retries: 3
 

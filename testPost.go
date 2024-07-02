@@ -13,7 +13,7 @@ var (
 	testPostCounter Counter
 )
 
-func (c *safeConn) testPost(article *nntp.Article) error {
+func testPost(article *nntp.Article) error {
 	// for posting error testing
 	counter := testPostCounter.inc()
 	if counter%75 == 0 {
@@ -23,11 +23,17 @@ func (c *safeConn) testPost(article *nntp.Article) error {
 	return writeArticle(testPath, article)
 }
 
-func post(conn *safeConn, article *nntp.Article) error {
+func post(article *nntp.Article) error {
 	if conf.Test != "" {
-		return conn.testPost(article)
+		return testPost(article)
 	}
-	return conn.Post(article)
+	if conn, err := pool.Get(ctx); err != nil {
+		checkForFatalErr(err)
+	} else {
+		defer pool.Put(conn)
+		return conn.Post(article)
+	}
+	return nil
 }
 
 func writeArticle(path string, article *nntp.Article) error {
@@ -64,18 +70,4 @@ func writeArticle(path string, article *nntp.Article) error {
 	savedMessages.inc()
 	return nil
 
-}
-
-func headerCheck(conn *safeConn, article *Article) error {
-	if conf.Test != "" {
-		// for posting error testing
-		counter := testPostCounter.inc()
-		if counter%100 == 0 {
-			return fmt.Errorf("test error")
-		}
-	} else {
-		_, err := conn.Head(article.Article.Header["Message-ID"][0])
-		return err
-	}
-	return nil
 }

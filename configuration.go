@@ -27,19 +27,19 @@ func loadConfig() error {
 			fmt.Println("Configuration file not found. Creating configuration file...")
 			defaultConfig := []byte(defaultConfig())
 			if err := os.WriteFile(filepath.Join(confFilePath, configFileName), defaultConfig, 0644); err != nil {
-				checkForFatalErr(fmt.Errorf("Error creating configuration file: %v", err))
+				checkForFatalErr(fmt.Errorf("error creating configuration file: %v", err))
 			} else {
 				Log.Info("Configuration file \"%v\" created.", filepath.Join(confFilePath, configFileName))
 				fmt.Println("Please edit default values!")
 				exit(0, nil)
 			}
 		} else {
-			checkForFatalErr(fmt.Errorf("Error reading configuration file: %v", err))
+			checkForFatalErr(fmt.Errorf("error reading configuration file: %v", err))
 		}
 	}
 
 	if err := viper.Unmarshal(&conf); err != nil {
-		checkForFatalErr(fmt.Errorf("Unable to decode configuration file structure: %v", err))
+		checkForFatalErr(fmt.Errorf("unable to decode configuration file structure: %v", err))
 	}
 
 	return nil

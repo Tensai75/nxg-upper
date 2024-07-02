@@ -11,10 +11,9 @@ func saveArticle(article Article) {
 
 		// todo: save faild articles
 		failed := failedMessages.inc()
-		if failed > totalParParts*80/100 {
-			checkForFatalErr(fmt.Errorf("Posting of %d messages faild. Recovery of upload not possible!", failed))
+		if failed > totalParParts {
+			checkForFatalErr(fmt.Errorf("posting of %d messages faild (recovery of upload not possible)", failed))
 		}
 	}
 
-	return
 }

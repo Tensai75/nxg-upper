@@ -15,44 +15,46 @@ import (
 type Args struct {
 	Path                string `arg:"positional,required" help:"Path to be uploaded" placeholder:"PATH"`
 	Host                string `arg:"--host" help:"Usenet server host name or IP address" placeholder:"HOST"`
-	Port                int    `arg:"--port" help:"Usenet server port number" placeholder:"INT"`
+	Port                uint32 `arg:"--port" help:"Usenet server port number" placeholder:"INT"`
 	SSL                 bool   `arg:"-"`
 	SSL_arg             string `arg:"--ssl" help:"Use SSL" placeholder:"true|false"`
 	NntpUser            string `arg:"--user" help:"Username to connect to the usenet server" placeholder:"STRING"`
 	NntpPass            string `arg:"--pass" help:"Password to connect to the usenet server" placeholder:"STRING"`
-	Connections         int    `arg:"--connections" help:"Number of connections to use to connect to the usenet server" placeholder:"INT"`
-	ConnRetries         int    `arg:"--connretries" help:"Number of retries upon connection error" placeholder:"INT"`
-	ConnWaitTime        int    `arg:"--connwaittime" help:"Time to wait in seconds before trying to re-connect" placeholder:"INT"`
+	Connections         uint32 `arg:"--connections" help:"Number of connections to use to connect to the usenet server" placeholder:"INT"`
+	ConnRetries         uint32 `arg:"--connretries" help:"Number of retries upon connection error" placeholder:"INT"`
+	ConnWaitTime        uint32 `arg:"--connwaittime" help:"Time to wait in seconds before trying to re-connect" placeholder:"INT"`
 	Groups              string `arg:"--groups" help:"List of groups (separated by commas) to post to" placeholder:"GROUPS"`
-	LineLength          int    `arg:"--linelength" help:"Line length of the yEnc encoded article body" placeholder:"INT"`
-	ArticleSize         int64  `arg:"--articlesize" help:"Size of the article body in bytes" placeholder:"BYTES"`
-	Retries             int    `arg:"--retries" help:"Number of retries before article posting fails" placeholder:"INT"`
-	Poster              string `arg:"--poster" help:"Poster (From address) for the articles (leave empty for random poster)" placeholder:"EMAIL"`
+	LineLength          uint32 `arg:"--linelength" help:"Line length of the yEnc encoded article body" placeholder:"INT"`
+	ArticleSize         uint64 `arg:"--articlesize" help:"Size of the article body in bytes" placeholder:"BYTES"`
+	Retries             uint32 `arg:"--retries" help:"Number of retries before article posting fails" placeholder:"INT"`
+	Poster              string `arg:"--poster" help:"Poster (From address) for the articles (leave empty for random poster for each upload)" placeholder:"EMAIL"`
 	Obfuscate           bool   `arg:"-"`
-	Obfuscate_arg       string `arg:"--obfuscate" help:"Obfuscate the upload" placeholder:"true|false"`
+	Obfuscate_arg       string `arg:"--obfuscate" help:"Obfuscate the subject of upload" placeholder:"true|false"`
 	ObfuscatePoster     bool   `arg:"-"`
 	ObfuscatePoster_arg string `arg:"--obfuscateposter" help:"Obfuscate also the poster (From address)" placeholder:"true|false"`
 	ObfuscateYenc       bool   `arg:"-"`
 	ObfuscateYenc_arg   string `arg:"--obfuscateyenc" help:"Obfuscate also the yenc header" placeholder:"true|false"`
 	HeaderCheck         bool   `arg:"-"`
 	HeaderCheck_arg     string `arg:"--headercheck" help:"Activate header check" placeholder:"true|false"`
+	HeaderCheckDelay    uint32 `arg:"--headercheckdelay" help:"Header check delay in seconds" placeholder:"INT"`
+	HeaderCheckConns    uint32 `arg:"--headercheckconns" help:"Header check connections" placeholder:"INT"`
 	MakeRar             bool   `arg:"-"`
 	MakeRar_arg         string `arg:"--rar" help:"Make rar archive" placeholder:"true|false"`
 	ObfuscateRar        bool   `arg:"-"`
 	ObfuscateRar_arg    string `arg:"--obfuscaterar" help:"Obfuscate rar archive name" placeholder:"true|false"`
 	MakeVolumes         bool   `arg:"-"`
 	MakeVolumes_arg     string `arg:"--makevolumes" help:"Create rar volumes" placeholder:"true|false"`
-	MaxVolumes          int64  `arg:"--maxvolumes" help:"Maximum amount of volumes" placeholder:"INT"`
-	VolumeSize          int64  `arg:"--volumesize" help:"Minimum volume size in bytes" placeholder:"BYTES"`
+	MaxVolumes          uint64 `arg:"--maxvolumes" help:"Maximum amount of volumes" placeholder:"INT"`
+	VolumeSize          uint64 `arg:"--volumesize" help:"Minimum volume size in bytes" placeholder:"BYTES"`
 	Encrypt             bool   `arg:"-"`
 	Encrypt_arg         string `arg:"--encrypt" help:"Encrypt the rar file with a password" placeholder:"true|false"`
 	Password            string `arg:"--password" help:"Password for the rar file" placeholder:"STRING"`
-	PasswordLength      int    `arg:"--passwordlength" help:"Length of the random password for the rar file" placeholder:"NUMBER"`
-	Compression         int    `arg:"--compression" help:"Compression level for rar file" placeholder:"0-9"`
+	PasswordLength      uint32 `arg:"--passwordlength" help:"Length of the random password for the rar file" placeholder:"NUMBER"`
+	Compression         uint32 `arg:"--compression" help:"Compression level for rar file" placeholder:"0-9"`
 	RarExe              string `arg:"--rarexe" help:"Path to the rar executable" placeholder:"PATH"`
 	MakePar2            bool   `arg:"-"`
 	MakePar2_arg        string `arg:"--par2" help:"Make par2 files" placeholder:"true|false"`
-	Redundancy          int    `arg:"--redundancy" help:"Redundancy in %" placeholder:"0-100"`
+	Redundancy          uint32 `arg:"--redundancy" help:"Redundancy in %" placeholder:"0-100"`
 	Par2Exe             string `arg:"--parexe" help:"Path to the par executable (either par2 [par2cmdline] or parpar)" placeholder:"PATH"`
 	CsvPath             string `arg:"--csvpath" help:"CSV file path to log title, header, password, groups and date (leave empty too disable)" placeholder:"PATH"`
 	CsvDelimiter        string `arg:"--csvdelimiter" help:"CSV file delimiter" placeholder:"STRING"`
@@ -64,7 +66,7 @@ type Args struct {
 	LogFilePath         string `arg:"--log" help:"Path where to save the log file" placeholder:"PATH"`
 	NzbPath             string `arg:"--nzb" help:"Path where to save the NZB file" placeholder:"PATH"`
 	//	FaildArticles      string   `arg:"--faildarticles" help:"Path where to save failed articles"`
-	Verbose     int      `arg:"--verbose" help:"Verbosity level of cmd line output"  placeholder:"0-3"`
+	Verbose     uint32   `arg:"--verbose" help:"Verbosity level of cmd line output"  placeholder:"0-3"`
 	Debug       bool     `arg:"-"`
 	Debug_arg   string   `arg:"--debug" help:"Activate debug mode" placeholder:"true|false"`
 	Test        string   `arg:"--test" help:"Activate test mode and save messages to PATH" placeholder:"PATH"`
@@ -108,6 +110,8 @@ func parseArguments() {
 }
 
 func checkArguments() {
+	var err error
+
 	if conf.Groups != "" {
 		groupString := strings.Split(conf.Groups, ",")
 		for _, group := range groupString {
@@ -117,7 +121,7 @@ func checkArguments() {
 		}
 	} else {
 		writeUsage(argParser)
-		checkForFatalErr(fmt.Errorf("No groups provided"))
+		checkForFatalErr(fmt.Errorf("no groups provided"))
 	}
 
 	if conf.Poster == "" {
@@ -130,22 +134,22 @@ func checkArguments() {
 
 	if !filepath.IsAbs(conf.TempPath) {
 		if conf.TempPath, err = filepath.Abs(filepath.Join(homePath, conf.TempPath)); err != nil {
-			checkForFatalErr(fmt.Errorf("Unable to determine temporary path: %v", err))
+			checkForFatalErr(fmt.Errorf("unable to determine temporary path: %v", err))
 		}
 	}
 	if !filepath.IsAbs(conf.NzbPath) {
 		if conf.NzbPath, err = filepath.Abs(filepath.Join(homePath, conf.NzbPath)); err != nil {
-			checkForFatalErr(fmt.Errorf("Unable to determine NZB file path: %v", err))
+			checkForFatalErr(fmt.Errorf("unable to determine NZB file path: %v", err))
 		}
 	}
 	if !filepath.IsAbs(conf.LogFilePath) {
 		if conf.LogFilePath, err = filepath.Abs(filepath.Join(homePath, conf.LogFilePath)); err != nil {
-			checkForFatalErr(fmt.Errorf("Unable to determine log file path: %v", err))
+			checkForFatalErr(fmt.Errorf("unable to determine log file path: %v", err))
 		}
 	}
 	if !filepath.IsAbs(conf.CsvPath) {
 		if conf.CsvPath, err = filepath.Abs(filepath.Join(homePath, conf.CsvPath)); err != nil {
-			checkForFatalErr(fmt.Errorf("Unable to determine csv file path: %v", err))
+			checkForFatalErr(fmt.Errorf("unable to determine csv file path: %v", err))
 		}
 	}
 	if conf.PasswordLength == 0 {

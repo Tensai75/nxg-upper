@@ -105,15 +105,14 @@ func logEntry(logType string, logText string, vars ...interface{}) {
 }
 
 func initLogger(path string) {
-	var err error
-	if err = os.MkdirAll(path, os.ModePerm); err != nil {
-		checkForFatalErr(fmt.Errorf("Fatal error while opening log file '%s': %s\n", path, err))
+	if err := os.MkdirAll(path, os.ModePerm); err != nil {
+		checkForFatalErr(fmt.Errorf("fatal error while opening log file '%s': %s", path, err))
 	}
-	if logFile, err = os.OpenFile(filepath.Join(path, logFileName), os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666); err == nil {
+	if logFile, err := os.OpenFile(filepath.Join(path, logFileName), os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666); err == nil {
 		logger = log.New(logFile, "", log.Ldate|log.Ltime)
 		Log.Info("%s %s", appName, appVersion)
 	} else {
-		checkForFatalErr(fmt.Errorf("Fatal error while opening log file '%s': %s", path, err))
+		checkForFatalErr(fmt.Errorf("fatal error while opening log file '%s': %s", path, err))
 	}
 }
 

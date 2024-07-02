@@ -16,6 +16,7 @@ func writeCsv() {
 		folder  = filepath.Dir(conf.CsvPath)
 		csvFile *os.File
 		d       = conf.CsvDelimiter
+		err     error
 	)
 
 	if err = os.MkdirAll(folder, os.ModePerm); err != nil {

@@ -14,48 +14,49 @@ import (
 	"time"
 
 	"github.com/Tensai75/nntp"
-	"github.com/Tensai75/nzb-monkey-go/nzbparser"
+	"github.com/Tensai75/nzbparser"
 	"github.com/schollz/progressbar/v3"
 )
 
 type Chunk struct {
 	Filename   string
 	Checksum   uint32
-	FileNumber int
-	TotalFiles int
-	PartNumber int64
-	TotalParts int64
-	PartSize   int64
-	TotalSize  int64
-	StartByte  int64
-	EndByte    int64
+	FileNumber uint64
+	TotalFiles uint64
+	PartNumber uint64
+	TotalParts uint64
+	PartSize   uint64
+	TotalSize  uint64
+	StartByte  uint64
+	EndByte    uint64
 	Part       bytes.Buffer
 	Nzb        *nzbparser.Nzb
 }
 
 type File struct {
 	path       string
-	fileNo     int
-	totalFiles int
+	fileNo     uint64
+	totalFiles uint64
 	groups     []string
 	poster     string
 	nzb        *nzbparser.Nzb
 }
 
 type Article struct {
-	Segment *nzbparser.NzbSegment
-	Nzb     *nzbparser.Nzb
-	Article nntp.Article
-	FileNo  int
-	Retries int
+	Segment  *nzbparser.NzbSegment
+	Nzb      *nzbparser.Nzb
+	Article  nntp.Article
+	FileNo   uint64
+	Retries  uint32
+	PostTime time.Time
 }
 
 type Counter struct {
 	mu      sync.Mutex
-	counter int64
+	counter uint64
 }
 
-func (c *Counter) inc() int64 {
+func (c *Counter) inc() uint64 {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	c.counter++
@@ -74,49 +75,45 @@ var (
 	homePath          string
 	tempPath          string
 	testPath          string
-	postFunc          func(*nntp.Article) error
 	nzb               nzbparser.Nzb
 	title             string
 	shortHeader       string
-	totalDataParts    int64
-	totalDataSize     int64
-	totalParParts     int64
-	totalParSize      int64
+	totalDataParts    uint64
+	totalDataSize     uint64
+	totalParParts     uint64
+	totalParSize      uint64
 	uploadProgressBar *progressbar.ProgressBar
 	fatalError        sync.Once
-	err               error
 
 	// counters
-	dataPartCounter   Counter
-	parPartCounter    Counter
-	postedMessages    Counter
-	failedMessages    Counter
-	savedMessages     Counter
-	failedConnections Counter
+	dataPartCounter Counter
+	parPartCounter  Counter
+	postedMessages  Counter
+	failedMessages  Counter
+	savedMessages   Counter
 
 	// WaitGroups
-	filePosterWG    sync.WaitGroup
-	yEncoderWG      sync.WaitGroup
-	articlePosterWG sync.WaitGroup
-	posterWG        sync.WaitGroup
-	chunksWG        sync.WaitGroup
+	chunksWG sync.WaitGroup
 
 	// cancel context
 	ctx, cancel = context.WithCancel(context.Background())
 )
 
 func init() {
+	var err error
+
 	// set path variables
 	if appExec, err = os.Executable(); err != nil {
-		checkForFatalErr(fmt.Errorf("Unable to determine application path"))
+		checkForFatalErr(fmt.Errorf("unable to determine application path"))
 	}
 	appPath = filepath.Dir(appExec)
 	if homePath, err = os.UserHomeDir(); err != nil {
-		checkForFatalErr(fmt.Errorf("Unable to determine home path"))
+		checkForFatalErr(fmt.Errorf("unable to determine home path"))
 	}
 }
 
 func main() {
+
 	defer cancel()
 	setConfPath()
 	loadConfig()
@@ -144,20 +141,21 @@ func main() {
 	// check for test mode
 	if conf.Test != "" {
 		testPath = filepath.Join(conf.Test, title)
-		if err = os.MkdirAll(testPath, os.ModePerm); err != nil {
-			checkForFatalErr(fmt.Errorf("Cannot create test path: %v", err))
+		if err := os.MkdirAll(testPath, os.ModePerm); err != nil {
+			checkForFatalErr(fmt.Errorf("cannot create test path: %v", err))
 		}
 	}
 
-	// launche the go-routines
-	filePosterWG.Add(1)
-	go filePoster(&filePosterWG)
+	// initialise the NNTP connection pool
+	initNntpPool()
 
-	if err = folderPoster(conf.Path); err != nil {
+	// launche the go-routines
+	go filePoster()
+
+	if err := folderPoster(conf.Path); err != nil {
 		checkForFatalErr(err)
 	}
 
-	filePosterWG.Wait()
 	chunksWG.Wait()
 
 	// prevent execution if fatal error occurred
@@ -207,7 +205,7 @@ func main() {
 	time.Sleep(math.MaxInt64)
 }
 
-func randomString(length int, salt int64, num bool) string {
+func randomString(length uint32, salt uint64, num bool) string {
 	var charset string
 	if num {
 		charset = "0123456789abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -232,12 +230,6 @@ func checkForFatalErr(err error) {
 			Log.Info("Fatal Error detected")
 			Log.Info("Cancelling upload")
 			cancel()
-
-			// finish the filePoster go routines to close the open files
-			files.empty()
-			files.close()
-			filePosterWG.Wait()
-
 			exit(1, fmt.Errorf("%v", err))
 		})
 		return
@@ -249,20 +241,22 @@ func exit(exitCode int, exitErr error) {
 	if tempPath != "" {
 		if conf.DelTempFolder {
 			Log.Info("Deleting temporary folder \"%v\"", tempPath)
-			if err = os.RemoveAll(tempPath); err != nil {
+			if err := os.RemoveAll(tempPath); err != nil {
 				Log.Warn("Error while deleting temporary folder: %v", err)
 			}
 		}
 	}
 	if exitCode == 0 && conf.DelInputFolder {
 		Log.Info("Deleting input folder folder \"%v\"", conf.Path)
-		if err = os.RemoveAll(conf.Path); err != nil {
+		if err := os.RemoveAll(conf.Path); err != nil {
 			Log.Warn("Error while deleting input folder: %v", err)
 		}
 	}
 	if exitCode > 0 {
 		Log.Error("%v", exitErr)
 	} else {
+		Log.Info("Posted messages: %v (%.2f%%)", postedMessages.counter, float64(postedMessages.counter)/float64(postedMessages.counter+failedMessages.counter)*100)
+		Log.Info("Failed messages: %v (%.2f%%)", failedMessages.counter, float64(failedMessages.counter)/float64(postedMessages.counter+failedMessages.counter)*100)
 		Log.Debug("Header: %s", nzb.Comment)
 		Log.Debug("Password: %s", conf.Password)
 		Log.Debug("NZB File: %s", filepath.Join(conf.NzbPath, filepath.Base(conf.Path)+".nzb"))

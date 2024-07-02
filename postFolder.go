@@ -46,7 +46,7 @@ var averageBitrate AverageBitrate
 func folderPoster(path string) error {
 
 	var (
-		parBlockSize int64
+		parBlockSize uint64
 		inputFiles   []string
 		err          error
 	)
@@ -101,17 +101,17 @@ func folderPoster(path string) error {
 	Log.Debug("Encoded header: %v", nzb.Comment)
 
 	// launche the go-routines
-	for i := 1; i <= conf.Connections*2; i++ {
-		yEncoderWG.Add(1)
-		go yEncEncoder(&yEncoderWG)
+	for i := uint32(1); i <= conf.Connections*2; i++ {
+		go yEncEncoder()
 	}
-	for i := 1; i <= conf.Connections*2; i++ {
-		articlePosterWG.Add(1)
-		go articlePoster(&articlePosterWG)
+	for i := uint32(1); i <= conf.Connections*2; i++ {
+		go articlePoster()
 	}
-	for i := 1; i <= conf.Connections; i++ {
-		posterWG.Add(1)
-		go poster(&posterWG, i, 0)
+	for i := uint32(1); i <= conf.Connections*2; i++ {
+		go poster()
+	}
+	for i := uint32(1); i <= conf.HeaderCheckConns*2; i++ {
+		go headerCheck()
 	}
 
 	Log.Info("Starting upload")
@@ -139,7 +139,7 @@ func folderPoster(path string) error {
 		}
 		return nil
 	}); err != nil {
-		return fmt.Errorf("Error while walking path \"%v\": %v", path, err)
+		return fmt.Errorf("error while walking path \"%v\": %v", path, err)
 	}
 
 	for i, filePath := range inputFiles {
@@ -147,10 +147,10 @@ func folderPoster(path string) error {
 		case <-ctx.Done():
 			return nil // Error somewhere, terminate
 		default: // Default is must to avoid blocking
-			files.Chan <- File{
+			filesChan <- File{
 				path:       filePath,
-				fileNo:     i + 1,
-				totalFiles: len(inputFiles),
+				fileNo:     uint64(i + 1),
+				totalFiles: uint64(len(inputFiles)),
 				groups:     conf.GroupsArray,
 				poster:     conf.Poster,
 				nzb:        &nzb,
@@ -158,20 +158,20 @@ func folderPoster(path string) error {
 		}
 	}
 
-	files.close()
+	close(filesChan)
 	return nil
 
 }
 
-func calculateFolderSize(path string, extension string) (int64, error) {
-	var size int64
-	if err = filepath.Walk(path, func(file string, info os.FileInfo, err error) error {
+func calculateFolderSize(path string, extension string) (uint64, error) {
+	var size uint64
+	if err := filepath.Walk(path, func(file string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
 		if !info.IsDir() {
 			if extension == "" || filepath.Ext(file) == extension {
-				size += info.Size()
+				size += uint64(info.Size())
 			}
 		}
 		return nil
@@ -181,15 +181,16 @@ func calculateFolderSize(path string, extension string) (int64, error) {
 	return size, nil
 }
 
-func calculateFolderTotalDataParts(path string) (int64, error) {
-	var totalParts int64
-	if err = filepath.Walk(path, func(file string, info os.FileInfo, err error) error {
+func calculateFolderTotalDataParts(path string) (uint64, error) {
+	var totalParts uint64
+	if err := filepath.Walk(path, func(file string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
 		if !info.IsDir() && filepath.Ext(file) != ".par2" {
-			fileParts := info.Size() / conf.ArticleSize
-			if info.Size()%conf.ArticleSize != 0 {
+			size := uint64(info.Size())
+			fileParts := size / conf.ArticleSize
+			if size%conf.ArticleSize != 0 {
 				fileParts++
 			}
 			totalParts += fileParts
@@ -201,15 +202,16 @@ func calculateFolderTotalDataParts(path string) (int64, error) {
 	return totalParts, nil
 }
 
-func calculateFolderTotalParParts(path string) (int64, error) {
-	var totalParts int64
-	if err = filepath.Walk(path, func(file string, info os.FileInfo, err error) error {
+func calculateFolderTotalParParts(path string) (uint64, error) {
+	var totalParts uint64
+	if err := filepath.Walk(path, func(file string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
 		if !info.IsDir() && filepath.Ext(file) == ".par2" {
-			fileParts := info.Size() / conf.ArticleSize
-			if info.Size()%conf.ArticleSize != 0 {
+			size := uint64(info.Size())
+			fileParts := size / conf.ArticleSize
+			if size%conf.ArticleSize != 0 {
 				fileParts++
 			}
 			totalParts += fileParts

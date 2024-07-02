@@ -14,12 +14,12 @@ import (
 	"github.com/schollz/progressbar/v3"
 )
 
-func rarFolder(path string, tempPath string, folderSize int64) error {
+func rarFolder(path string, tempPath string, folderSize uint64) error {
 
 	Log.Info("Starting rar process")
 
 	var (
-		volumeSize     int64
+		volumeSize     uint64
 		parameters     []string
 		cmdReader      io.ReadCloser
 		scanner        *bufio.Scanner
@@ -102,22 +102,22 @@ func rarFolder(path string, tempPath string, folderSize int64) error {
 	return nil
 }
 
-func setVolumeSize(folderSize int64, blockSize int64) (int64, error) {
+func setVolumeSize(folderSize uint64, blockSize uint64) (uint64, error) {
 
 	defaultVolumeSize := calculateVolumeSize(conf.VolumeSize, blockSize)
 
 	if conf.MakeVolumes && defaultVolumeSize < folderSize {
-		if (conf.MaxVolumes == 0) || (folderSize/int64(conf.MaxVolumes) <= defaultVolumeSize) {
+		if (conf.MaxVolumes == 0) || (folderSize/conf.MaxVolumes <= defaultVolumeSize) {
 			return defaultVolumeSize, nil
 		} else {
-			volumeSize := (folderSize / int64(conf.MaxVolumes)) + 1
+			volumeSize := (folderSize / conf.MaxVolumes) + 1
 			return calculateVolumeSize(volumeSize, blockSize), nil
 		}
 	}
 	return 0, nil
 }
 
-func calculateVolumeSize(volumeSize int64, blockSize int64) int64 {
+func calculateVolumeSize(volumeSize uint64, blockSize uint64) uint64 {
 	if volumeSize > 0 {
 		multiplier := volumeSize / blockSize
 		if volumeSize%blockSize != 0 {

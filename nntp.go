@@ -2,57 +2,67 @@ package main
 
 import (
 	"fmt"
-	"strconv"
-	"sync"
+	"time"
 
-	"github.com/Tensai75/nntp"
+	"github.com/Tensai75/nntpPool"
 )
-
-type safeConn struct {
-	sync.RWMutex
-	closed bool
-	*nntp.Conn
-}
 
 var (
-	initConnGuard   sync.Once
-	connectionGuard chan struct{}
+	pool            nntpPool.ConnectionPool
+	headerCheckPool nntpPool.ConnectionPool
 )
 
-func ConnectNNTP() (*safeConn, error) {
-	initConnGuard.Do(func() {
-		connectionGuard = make(chan struct{}, conf.Connections)
-	})
-	connectionGuard <- struct{}{} // will block if guard channel is already filled
-	var conn *nntp.Conn
-	if conf.SSL {
-		conn, err = nntp.DialTLS("tcp", conf.Host+":"+strconv.Itoa(conf.Port), nil)
-	} else {
-		conn, err = nntp.Dial("tcp", conf.Host+":"+strconv.Itoa(conf.Port))
-	}
-	if err != nil {
-		return nil, fmt.Errorf("Connection to usenet server failed: %v\r\n", err)
-	}
-	safeConn := safeConn{
-		Conn: conn,
-	}
-	if err = safeConn.Authenticate(conf.NntpUser, conf.NntpPass); err != nil {
-		safeConn.Close()
-		return nil, fmt.Errorf("Authentication with usenet server failed: %v\r\n", err)
-	}
-	return &safeConn, nil
-}
+func initNntpPool() {
+	var err error
 
-func (c *safeConn) Close() {
-	c.Lock()
-	defer c.Unlock()
-	if !c.closed {
-		if c.Conn != nil {
-			c.Quit()
+	uploadConnections := conf.Connections
+
+	go func() {
+		for {
+			select {
+			case v := <-nntpPool.LogChan:
+				Log.Debug(fmt.Sprintf("NNTPPool: %v", v))
+			case w := <-nntpPool.WarnChan:
+				Log.Warn(fmt.Sprintf("NNTPPool Error: %v", w.Error()))
+			}
 		}
-		if len(connectionGuard) > 0 {
-			<-connectionGuard
+	}()
+
+	if conf.HeaderCheck {
+		uploadConnections = conf.Connections - conf.HeaderCheckConns
+		if uploadConnections < 1 {
+			checkForFatalErr(fmt.Errorf("HeaderCheckConns must be smaller than the number of connections"))
 		}
-		c.closed = true
+		if headerCheckPool, err = nntpPool.New(&nntpPool.Config{
+			Host:                  conf.Host,
+			Port:                  conf.Port,
+			SSL:                   conf.SSL,
+			SkipSSLCheck:          true,
+			User:                  conf.NntpUser,
+			Pass:                  conf.NntpPass,
+			ConnWaitTime:          time.Duration(conf.ConnWaitTime) * time.Second,
+			MaxConns:              conf.HeaderCheckConns,
+			IdleTimeout:           30 * time.Second,
+			MaxConnErrors:         conf.Retries,
+			MaxTooManyConnsErrors: 3,
+		}, 0); err != nil {
+			checkForFatalErr(err)
+		}
+	}
+
+	if pool, err = nntpPool.New(&nntpPool.Config{
+		Host:                  conf.Host,
+		Port:                  conf.Port,
+		SSL:                   conf.SSL,
+		SkipSSLCheck:          true,
+		User:                  conf.NntpUser,
+		Pass:                  conf.NntpPass,
+		ConnWaitTime:          time.Duration(conf.ConnWaitTime) * time.Second,
+		MaxConns:              uploadConnections,
+		IdleTimeout:           30 * time.Second,
+		MaxConnErrors:         conf.Retries,
+		MaxTooManyConnsErrors: 3,
+	}, 0); err != nil {
+		checkForFatalErr(err)
 	}
 }
